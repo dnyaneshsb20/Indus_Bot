@@ -1,0 +1,15 @@
+CNC Machine Operating Manual
+
+Problem: Excessive heat generation during CNC machine operation
+
+Cause:
+- High cutting load
+- Inadequate lubrication of moving parts
+- Blocked cooling fans or ventilation paths
+- Continuous operation without cooling intervals
+
+Solution:
+1. Inspect and maintain the lubrication system regularly
+2. Reduce cutting load and optimize machining parameters
+3. Clean cooling fans and ventilation openings
+4. Allow periodic cooling breaks during long operations

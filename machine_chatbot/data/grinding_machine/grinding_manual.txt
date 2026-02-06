@@ -1,0 +1,15 @@
+Grinding Machine Operating Manual
+
+Problem: Poor surface finish on the workpiece during grinding operation
+
+Cause:
+- Dull or worn-out grinding wheel
+- Improper feed rate
+- Insufficient or improper coolant flow
+- Unbalanced or misaligned grinding wheel
+
+Solution:
+1. Dress or replace the grinding wheel to restore sharpness
+2. Reduce the feed rate to improve surface quality
+3. Apply suitable coolant to reduce heat and friction
+4. Check and correct the balance and alignment of the grinding wheel

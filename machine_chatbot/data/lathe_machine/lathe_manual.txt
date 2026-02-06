@@ -1,0 +1,15 @@
+Lathe Machine Operating Manual
+
+Problem: Excessive heat generation during lathe operation
+
+Cause:
+- High cutting speed or feed rate
+- Improper tool geometry or worn cutting tool
+- Insufficient lubrication of spindle and moving parts
+- Continuous machining without cooling intervals
+
+Solution:
+1. Reduce cutting speed and feed rate according to material type
+2. Replace or regrind worn cutting tools
+3. Ensure proper lubrication of spindle and carriage mechanisms
+4. Allow periodic cooling breaks during long machining operations

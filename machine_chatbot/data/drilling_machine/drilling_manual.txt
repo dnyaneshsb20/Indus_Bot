@@ -1,0 +1,16 @@
+Drilling Machine Operating Manual
+
+Problem: Drill bit overheating during operation
+
+Cause:
+- Excessive drilling speed
+- Dull or worn-out drill bit
+- Insufficient coolant or lubrication
+- Incorrect feed rate
+
+Solution:
+1. Reduce the spindle speed according to material type
+2. Replace or sharpen the drill bit
+3. Apply proper coolant or cutting fluid
+4. Adjust the feed rate to recommended values
+5. Ensure proper alignment of the drill bit

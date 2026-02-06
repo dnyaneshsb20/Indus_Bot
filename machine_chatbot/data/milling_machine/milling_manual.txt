@@ -1,0 +1,15 @@
+Milling Machine Operating Manual
+
+Problem: Excessive vibration during milling operation
+
+Cause:
+- Improperly clamped or loose workpiece
+- Worn or damaged cutting tool
+- Incorrect spindle speed or feed rate
+- Machine or tool holder misalignment
+
+Solution:
+1. Secure the workpiece firmly using proper clamping methods
+2. Replace worn or damaged cutting tools
+3. Adjust spindle speed and feed rate according to material type
+4. Check and correct machine and tool holder alignment

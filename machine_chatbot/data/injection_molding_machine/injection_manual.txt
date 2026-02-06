@@ -1,0 +1,15 @@
+Injection Molding Machine Operating Manual
+
+Problem: Incomplete filling of molded product
+
+Cause:
+- Insufficient injection pressure
+- Improper barrel or mold temperature
+- Poor mold alignment or blockage
+- Low-quality or improperly dried raw material
+
+Solution:
+1. Increase injection pressure to ensure complete mold filling
+2. Adjust barrel and mold temperature to recommended levels
+3. Inspect and correct mold alignment and flow paths
+4. Verify material quality and ensure proper drying before use
