@@ -89,8 +89,8 @@ const ChatUI = ({
                             onClick={sendMessage}
                             disabled={!selectedMachine || !question.trim()}
                             className={`border px-4 py-2 rounded ${isDarkMode
-                                    ? "bg-blue-600 text-white disabled:bg-gray-600"
-                                    : "bg-blue-500 text-white disabled:bg-gray-300"
+                                ? "bg-blue-600 text-white disabled:bg-gray-600"
+                                : "bg-blue-500 text-white disabled:bg-gray-300"
                                 }`}
                         >
                             Send
