@@ -28,7 +28,7 @@ const Dashboard = () => {
 
   return (
     <MainLayout>
-      <div className="flex h-full">
+      <div className="flex h-[calc(100vh-64px)]">
         <Sidebar />
 
         <div className="flex flex-col flex-1">

@@ -20,7 +20,7 @@ const Sidebar = () => {
   ];
 
   return (
-    <aside className="w-72 bg-gray-900 border-r border-gray-800 p-4">
+    <aside className="h-screen w-72 bg-gray-900 border-r border-gray-800 p-4">
       <div className="space-y-2">
         {items.map((item) => (
           <button
