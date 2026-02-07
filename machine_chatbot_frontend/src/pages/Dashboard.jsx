@@ -1,8 +1,8 @@
-import React, { useState } from "react";
-import Navbar from "../components/Navbar";
+import { useState } from "react";
 import Sidebar from "../components/Sidebar";
 import ChatInput from "../components/ChatInput";
-import ChatMessage from "../components/ChatMessage";
+import ChatMessage from "../components/ChatMsg";
+import MainLayout from "../layouts/MainLayout";
 
 const Dashboard = () => {
   const [messages, setMessages] = useState([]);
@@ -18,26 +18,30 @@ const Dashboard = () => {
       });
       const data = await res.json();
       setMessages((prev) => [...prev, { message: data.answer, fromUser: false }]);
-    } catch (err) {
-      setMessages((prev) => [...prev, { message: "Error connecting to backend", fromUser: false }]);
+    } catch {
+      setMessages((prev) => [
+        ...prev,
+        { message: "Backend not reachable", fromUser: false },
+      ]);
     }
   };
 
   return (
-    <div className="flex flex-col h-screen bg-gray-900">
-      <Navbar />
-      <div className="flex flex-1 overflow-hidden">
+    <MainLayout>
+      <div className="flex h-full">
         <Sidebar />
+
         <div className="flex flex-col flex-1">
-          <div className="flex-1 overflow-y-auto p-6 space-y-2">
-            {messages.map((msg, idx) => (
-              <ChatMessage key={idx} message={msg.message} fromUser={msg.fromUser} />
+          <div className="flex-1 overflow-y-auto p-6">
+            {messages.map((msg, i) => (
+              <ChatMessage key={i} {...msg} />
             ))}
           </div>
+
           <ChatInput onSend={handleSend} />
         </div>
       </div>
-    </div>
+    </MainLayout>
   );
 };
 

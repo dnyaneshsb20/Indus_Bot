@@ -3,7 +3,8 @@ import pickle
 from sentence_transformers import SentenceTransformer
 
 VECTOR_DB_DIR = "vector_db"
-model = SentenceTransformer("all-MiniLM-L6-v2")
+model = SentenceTransformer("all-MiniLM-L6-v2", device="cpu")
+
 
 def detect_machine(user_query: str):
     query = user_query.lower()

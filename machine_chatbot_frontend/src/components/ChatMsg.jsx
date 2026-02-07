@@ -1,3 +1,4 @@
+//ChatMsg.jsx
 import React, { useState } from "react";
 
 const ChatMessage = ({ message, fromUser }) => {
