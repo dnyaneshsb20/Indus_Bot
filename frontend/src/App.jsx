@@ -1,90 +1,84 @@
 import { useState } from "react";
 import { askQuestion } from "./services/api";
+import ChatUI from "./components/ChatUI";
+import Sidebar from "./components/Sidebar";
 
 function App() {
-  const [messages, setMessages] = useState([]);
-  const [question, setQuestion] = useState("");
-  const [loading, setLoading] = useState(false);
+    const [messages, setMessages] = useState([]);
+    const [question, setQuestion] = useState("");
+    const [loading, setLoading] = useState(false);
+    const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+    const [selectedMachine, setSelectedMachine] = useState("");
 
-  const sendMessage = async () => {
-    if (!question.trim()) return;
+    const toggleSidebar = () => {
+        setIsSidebarOpen((prev) => !prev);
+    };
 
-    setMessages((prev) => [
-      ...prev,
-      { sender: "user", text: question },
-    ]);
+    const sendMessage = async () => {
+        if (!question.trim() || !selectedMachine) return;
 
-    setQuestion("");
-    setLoading(true);
+        setMessages((prev) => [
+            ...prev,
+            { sender: "user", text: question },
+        ]);
 
-    try {
-      const res = await askQuestion(question);
-      const answer = res.data.answer || "No response";
+        setQuestion("");
+        setLoading(true);
 
-      setMessages((prev) => [
-        ...prev,
-        { sender: "bot", text: answer },
-      ]);
-    } catch {
-      setMessages((prev) => [
-        ...prev,
-        { sender: "bot", text: "❌ Backend error" },
-      ]);
-    } finally {
-      setLoading(false);
-    }
-  };
+        try {
+            const res = await askQuestion(question);
+            const answer = res.data.answer || "No response";
 
-  return (
-    <div className="h-screen flex flex-col p-4">
+            setMessages((prev) => [
+                ...prev,
+                { sender: "bot", text: answer },
+            ]);
+        } catch {
+            setMessages((prev) => [
+                ...prev,
+                { sender: "bot", text: "❌ Backend error" },
+            ]);
+        } finally {
+            setLoading(false);
+        }
+    };
 
-      {/* Header */}
-      <h1 className="text-xl font-bold mb-4">
-        IndusBot
-      </h1>
+    return (
+        <div className="h-screen flex">
 
-      {/* Messages */}
-      <div className="flex-1 border p-3 overflow-y-auto space-y-2">
-        {messages.map((msg, i) => (
-          <div
-            key={i}
-            className={`p-2 rounded max-w-xl ${
-              msg.sender === "user"
-                ? "bg-blue-100 ml-auto text-right"
-                : "bg-gray-200 mr-auto"
-            }`}
-          >
-            {msg.text}
-          </div>
-        ))}
+            {/* Sidebar */}
+            <Sidebar
+                isOpen={isSidebarOpen}
+                toggleSidebar={toggleSidebar}
+            />
 
-        {loading && (
-          <div className="bg-gray-200 p-2 rounded w-fit">
-            Typing...
-          </div>
-        )}
-      </div>
+            {/* Chat Section */}
+            <div className="flex-1 relative">
 
-      {/* Input */}
-      <div className="flex gap-2 mt-3">
-        <input
-          type="text"
-          value={question}
-          onChange={(e) => setQuestion(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && sendMessage()}
-          placeholder="Type your question..."
-          className="flex-1 border px-3 py-2"
-        />
-        <button
-          onClick={sendMessage}
-          className="border px-4 py-2 bg-blue-500 text-white"
-        >
-          Send
-        </button>
-      </div>
+                {/* Hamburger button when sidebar closed */}
+                {!isSidebarOpen && (
+                    <button
+                        onClick={toggleSidebar}
+                        className="absolute top-4 left-4 z-10 bg-gray-800 text-white px-3 py-1 rounded"
+                    >
+                        ☰
+                    </button>
+                )}
 
-    </div>
-  );
+                <ChatUI
+                    messages={messages}
+                    question={question}
+                    setQuestion={setQuestion}
+                    sendMessage={sendMessage}
+                    loading={loading}
+                    isSidebarOpen={isSidebarOpen}
+                    selectedMachine={selectedMachine}
+                    setSelectedMachine={setSelectedMachine}
+                />
+            </div>
+
+        </div>
+    );
 }
 
 export default App;
