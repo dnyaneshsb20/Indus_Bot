@@ -4,81 +4,89 @@ import ChatUI from "./components/ChatUI";
 import Sidebar from "./components/Sidebar";
 
 function App() {
-    const [messages, setMessages] = useState([]);
-    const [question, setQuestion] = useState("");
-    const [loading, setLoading] = useState(false);
-    const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-    const [selectedMachine, setSelectedMachine] = useState("");
+  const [messages, setMessages] = useState([]);
+  const [question, setQuestion] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [selectedMachine, setSelectedMachine] = useState("");
+  const [isDarkMode, setIsDarkMode] = useState(false); // ✅ added
 
-    const toggleSidebar = () => {
-        setIsSidebarOpen((prev) => !prev);
-    };
+  const toggleSidebar = () => {
+    setIsSidebarOpen((prev) => !prev);
+  };
 
-    const sendMessage = async () => {
-        if (!question.trim() || !selectedMachine) return;
+  const toggleTheme = () => {
+    setIsDarkMode((prev) => !prev);
+  };
 
-        setMessages((prev) => [
-            ...prev,
-            { sender: "user", text: question },
-        ]);
+  const sendMessage = async () => {
+    if (!question.trim() || !selectedMachine) return;
 
-        setQuestion("");
-        setLoading(true);
+    setMessages((prev) => [
+      ...prev,
+      { sender: "user", text: question },
+    ]);
 
-        try {
-            const res = await askQuestion(question);
-            const answer = res.data.answer || "No response";
+    setQuestion("");
+    setLoading(true);
 
-            setMessages((prev) => [
-                ...prev,
-                { sender: "bot", text: answer },
-            ]);
-        } catch {
-            setMessages((prev) => [
-                ...prev,
-                { sender: "bot", text: "❌ Backend error" },
-            ]);
-        } finally {
-            setLoading(false);
-        }
-    };
+    try {
+      const res = await askQuestion(question);
+      const answer = res.data.answer || "No response";
 
-    return (
-        <div className="h-screen flex">
+      setMessages((prev) => [
+        ...prev,
+        { sender: "bot", text: answer },
+      ]);
+    } catch {
+      setMessages((prev) => [
+        ...prev,
+        { sender: "bot", text: "❌ Backend error" },
+      ]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-            {/* Sidebar */}
-            <Sidebar
-                isOpen={isSidebarOpen}
-                toggleSidebar={toggleSidebar}
-            />
+  return (
+    <div className="h-screen flex">
 
-            {/* Chat Section */}
-            <div className="flex-1 relative">
+      {/* Sidebar (UNCHANGED) */}
+      <Sidebar
+        isOpen={isSidebarOpen}
+        toggleSidebar={toggleSidebar}
+        isDarkMode={isDarkMode}
+      />
 
-                {/* Hamburger button when sidebar closed */}
-                {!isSidebarOpen && (
-                    <button
-                        onClick={toggleSidebar}
-                        className="absolute top-4 left-4 z-10 bg-gray-800 text-white px-3 py-1 rounded"
-                    >
-                        ☰
-                    </button>
-                )}
+      {/* Chat Section */}
+      <div className="flex-1 relative">
 
-                <ChatUI
-                    messages={messages}
-                    question={question}
-                    setQuestion={setQuestion}
-                    sendMessage={sendMessage}
-                    loading={loading}
-                    isSidebarOpen={isSidebarOpen}
-                    selectedMachine={selectedMachine}
-                    setSelectedMachine={setSelectedMachine}
-                />
-            </div>
+        {/* Hamburger when sidebar closed */}
+        {!isSidebarOpen && (
+          <button
+            onClick={toggleSidebar}
+            className="absolute top-4 left-4 z-10 bg-gray-800 text-white px-3 py-1 rounded"
+          >
+            ☰
+          </button>
+        )}
 
-        </div>
-    );
+        <ChatUI
+          messages={messages}
+          question={question}
+          setQuestion={setQuestion}
+          sendMessage={sendMessage}
+          loading={loading}
+          isSidebarOpen={isSidebarOpen}
+          selectedMachine={selectedMachine}
+          setSelectedMachine={setSelectedMachine}
+          isDarkMode={isDarkMode}
+          toggleTheme={toggleTheme}
+        />
+      </div>
+
+    </div>
+  );
 }
 
 export default App;

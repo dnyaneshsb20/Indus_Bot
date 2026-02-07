@@ -1,29 +1,20 @@
-const Sidebar = ({ isOpen, toggleSidebar }) => {
+const Sidebar = ({ isOpen, toggleSidebar, isDarkMode }) => {
   return (
     <div
-      className={`h-full bg-white transition-all duration-300
-        ${isOpen ? "w-64 p-4" : "w-0 p-0 overflow-hidden"}
-      `}
+      className={`${
+        isOpen ? "w-64" : "w-0"
+      } transition-all duration-300 overflow-hidden 
+        ${isDarkMode ? "bg-gray-800 text-white" : "bg-gray-200 text-black"}`}
     >
-      {/* Header */}
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="font-bold">Menu</h2>
-        <button onClick={toggleSidebar} className="text-sm">
-          ✖
-        </button>
+      <div className="p-4 font-bold flex justify-between items-center">
+        Menu
+        <button onClick={toggleSidebar}>✕</button>
       </div>
 
-      {/* Dummy options (you’ll replace later) */}
-      <ul className="space-y-3">
-        <li className="cursor-pointer hover:text-blue-300">
-          Dashboard
-        </li>
-        <li className="cursor-pointer hover:text-blue-300">
-          History
-        </li>
-        <li className="cursor-pointer hover:text-blue-300">
-          Settings
-        </li>
+      <ul className="p-4 space-y-2">
+        <li className="cursor-pointer hover:underline">Option 1</li>
+        <li className="cursor-pointer hover:underline">Option 2</li>
+        <li className="cursor-pointer hover:underline">Option 3</li>
       </ul>
     </div>
   );
