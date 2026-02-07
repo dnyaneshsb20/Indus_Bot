@@ -40,7 +40,7 @@ function App() {
 
       {/* Header */}
       <h1 className="text-xl font-bold mb-4">
-        🤖 Andon AI Chatbot
+        Indus AI Chatbot
       </h1>
 
       {/* Messages */}
