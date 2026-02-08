@@ -1,3 +1,120 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@keyframes gradient {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+}
+
+@keyframes typing {
+    0%, 60%, 100% { transform: translateY(0); }
+    30% { transform: translateY(-6px); }
+}
+
+@keyframes orbit {
+    from { transform: rotate(0deg) translateX(60px) rotate(0deg); }
+    to { transform: rotate(360deg) translateX(60px) rotate(-360deg); }
+}
+
+@keyframes slide-in {
+    from { 
+        opacity: 0;
+        transform: translateX(20px);
+    }
+    to { 
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes message-in {
+    from { 
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to { 
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes pulse-glow {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+}
+
+/* Tailwind animations */
+.animate-gradient {
+    background-size: 200% 200%;
+    animation: gradient 3s ease infinite;
+}
+
+.animate-float {
+    animation: float 3s ease-in-out infinite;
+}
+
+.animate-slide-in {
+    animation: slide-in 0.5s ease-out;
+}
+
+.animate-message-in {
+    animation: message-in 0.3s ease-out;
+}
+
+.animate-fade-in {
+    animation: fade-in 0.5s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.animate-slide-in {
+    animation: slideIn 0.3s ease-out;
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* Smooth sidebar transitions */
+.sidebar-enter {
+    transform: translateX(-100%);
+}
+
+.sidebar-enter-active {
+    transform: translateX(0);
+    transition: transform 300ms ease-in-out;
+}
+
+.sidebar-exit {
+    transform: translateX(0);
+}
+
+.sidebar-exit-active {
+    transform: translateX(-100%);
+    transition: transform 300ms ease-in-out;
+}
