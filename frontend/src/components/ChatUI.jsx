@@ -22,6 +22,7 @@ import {
     TbBrandOpenai,
     TbSparkles
 } from 'react-icons/tb';
+import { FiCpu, FiServer, FiAperture } from 'react-icons/fi';
 import Sidebar from './Sidebar';
 import ib from "../assets/ib2.png";
 
@@ -41,6 +42,7 @@ const ChatUI = ({
     const messagesEndRef = useRef(null);
     const [inputFocused, setInputFocused] = useState(false);
     const [selectedQuickQuestion, setSelectedQuickQuestion] = useState(null);
+    const [scanActive, setScanActive] = useState(true);
 
     // Auto-scroll to bottom of messages
     useEffect(() => {
@@ -167,9 +169,49 @@ const ChatUI = ({
             <div className="flex-1 h-screen flex flex-col">
                 {isFirstLoad ? (
                     /* Welcome Screen */
-                    <div className="flex-1 flex flex-col items-center justify-center px-4 py-6">
-                        {/* Hero Section */}
-                        <div className="text-center max-w-2xl mx-auto">
+                    <div className="flex-1 flex flex-col items-center justify-center px-4 py-6 relative">
+                        {/* Background Layer */}
+                        <div className="absolute inset-0">
+                            {/* Grid Pattern */}
+                            <div
+                                className="absolute inset-0"
+                                style={{
+                                    backgroundImage: `linear-gradient(${isDarkMode ? 'rgba(59, 130, 246, 0.1)' : 'rgba(59, 130, 246, 0.02)'} 1px, transparent 1px),
+                                  linear-gradient(90deg, ${isDarkMode ? 'rgba(59, 130, 246, 0.1)' : 'rgba(59, 130, 246, 0.02)'} 1px, transparent 1px)`,
+                                    backgroundSize: '60px 60px',
+                                }}
+                            />
+
+                            {/* Scanning effect */}
+                            {scanActive && (
+                                <div
+                                    className={`absolute inset-0 ${isDarkMode
+                                        ? "bg-gradient-to-b from-transparent via-blue-500/10 to-transparent"
+                                        : "bg-gradient-to-b from-transparent via-blue-400/2 to-transparent"
+                                        } animate-scan-vertical`}
+                                />
+                            )}
+
+                            {/* Floating elements */}
+                            {[...Array(6)].map((_, i) => (
+                                <div
+                                    key={i}
+                                    className={`absolute animate-float ${isDarkMode ? "text-blue-500/10" : "text-blue-400/2"}`}
+                                    style={{
+                                        fontSize: `${Math.random() * 40 + 20}px`,
+                                        left: `${Math.random() * 100}%`,
+                                        top: `${Math.random() * 100}%`,
+                                        animationDelay: `${i * 0.5}s`,
+                                        animationDuration: `${Math.random() * 20 + 10}s`,
+                                    }}
+                                >
+                                    {[<FiCpu key={i} />, <FiServer key={i} />, <FiAperture key={i} />][i % 3]}
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* Hero Section (Existing content untouched) */}
+                        <div className="text-center max-w-2xl mx-auto relative z-10">
                             {/* Animated Icon */}
                             <div className={`relative mb-4 inline-block p-6 rounded-2xl ${isDarkMode
                                 ? "bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700"
@@ -188,14 +230,11 @@ const ChatUI = ({
                                 </div>
                             </div>
 
-
                             {/* Welcome Text */}
-                            <h1 className={`text-4xl font-bold mb-4 ${isDarkMode ? "text-gray-100" : "text-gray-900"
-                                }`}>
+                            <h1 className={`text-4xl font-bold mb-4 ${isDarkMode ? "text-gray-100" : "text-gray-900"}`}>
                                 Welcome to <span className="bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">IndusBot AI</span>
                             </h1>
-                            <p className={`text-lg mb-4 ${isDarkMode ? "text-gray-400" : "text-gray-600"
-                                }`}>
+                            <p className={`text-lg mb-4 ${isDarkMode ? "text-gray-400" : "text-gray-600"}`}>
                                 Your intelligent assistant for industrial machine troubleshooting, maintenance guidance, and operational support.
                             </p>
 
@@ -204,45 +243,11 @@ const ChatUI = ({
                                 ? selectedMachine ? "bg-green-900/20 border border-green-800/30" : "bg-gray-800 border border-gray-700"
                                 : selectedMachine ? "bg-green-50 border border-green-200" : "bg-gray-100 border border-gray-200"
                                 }`}>
-                                <div className={`w-3 h-3 rounded-full ${selectedMachine ? "bg-green-500 animate-pulse" : "bg-amber-500"
-                                    }`}></div>
-                                <span className={`font-medium ${isDarkMode ? "text-gray-300" : "text-gray-700"
-                                    }`}>
-                                    {selectedMachine
-                                        ? `Connected to ${selectedMachine}`
-                                        : "Select a machine to begin"}
+                                <div className={`w-3 h-3 rounded-full ${selectedMachine ? "bg-green-500 animate-pulse" : "bg-amber-500"}`}></div>
+                                <span className={`font-medium ${isDarkMode ? "text-gray-300" : "text-gray-700"}`}>
+                                    {selectedMachine ? `Connected to ${selectedMachine}` : "Select a machine to begin"}
                                 </span>
                             </div>
-
-                            {/* Quick Questions Grid */}
-                            {/* <div className="mb-10">
-                                <h3 className={`text-sm font-semibold mb-4 ${
-                                    isDarkMode ? "text-gray-400" : "text-gray-500"
-                                }`}>QUICK QUESTIONS</h3>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-w-xl mx-auto">
-                                    {quickQuestions.map((q, index) => (
-                                        <button
-                                            key={index}
-                                            onClick={() => handleQuickQuestion(q)}
-                                            className={`group flex items-center gap-3 p-4 rounded-xl text-left transition-all duration-300 ${
-                                                isDarkMode
-                                                    ? "bg-gray-800 hover:bg-gray-700 border border-gray-700 hover:border-blue-500/50"
-                                                    : "bg-white hover:bg-gray-50 border border-gray-200 hover:border-blue-400 shadow-sm hover:shadow"
-                                            } ${selectedQuickQuestion === q ? 'ring-2 ring-blue-500' : ''}`}
-                                        >
-                                            <TbSparkles className={`w-5 h-5 ${
-                                                isDarkMode ? "text-blue-400" : "text-blue-500"
-                                            }`} />
-                                            <span className={`flex-1 text-sm ${
-                                                isDarkMode ? "text-gray-300" : "text-gray-700"
-                                            }`}>{q}</span>
-                                            <FiChevronDown className={`w-4 h-4 transition-transform group-hover:translate-x-0.5 ${
-                                                isDarkMode ? "text-gray-400" : "text-gray-500"
-                                            }`} />
-                                        </button>
-                                    ))}
-                                </div>
-                            </div> */}
 
                             {/* Input Area */}
                             <div className="max-w-2xl mx-auto">
@@ -267,13 +272,10 @@ const ChatUI = ({
                                         }
                                         onFocus={() => setInputFocused(true)}
                                         onBlur={() => setInputFocused(false)}
-                                        placeholder={
-                                            selectedMachine
-                                                ? "Describe your issue or ask a question..."
-                                                : "Please select a machine first..."
-                                        }
-                                        className={`flex-1 bg-transparent px-5 py-4 focus:outline-none disabled:opacity-50 ${isDarkMode ? "placeholder-gray-500" : "placeholder-gray-400"
-                                            }`}
+                                        placeholder={selectedMachine
+                                            ? "Describe your issue or ask a question..."
+                                            : "Please select a machine first..."}
+                                        className={`flex-1 bg-transparent px-5 py-4 focus:outline-none disabled:opacity-50 ${isDarkMode ? "placeholder-gray-500" : "placeholder-gray-400"}`}
                                     />
                                     <button
                                         onClick={sendMessage}
