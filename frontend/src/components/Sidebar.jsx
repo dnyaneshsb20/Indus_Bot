@@ -275,11 +275,11 @@ const Sidebar = ({ isOpen, toggleSidebar, isDarkMode }) => {
                         </div>
                     ) : (
                         <div className="flex flex-col items-center space-y-4">
-                            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${isDarkMode
-                                ? "bg-gray-800"
-                                : "bg-gray-100"
+                            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${isDarkMode ? "bg-gray-100" : "bg-gray-800"
                                 }`}>
-                                <span className="font-semibold text-sm">JD</span>
+                                <span className={`font-semibold ${isDarkMode ? "text-gray-900" : "text-white"}`}>
+                                    DB
+                                </span>
                             </div>
                             <button className={`p-2.5 rounded-lg ${isDarkMode
                                 ? "hover:bg-gray-800 text-gray-400"

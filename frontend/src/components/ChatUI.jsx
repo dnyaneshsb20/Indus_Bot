@@ -16,6 +16,7 @@ import {
     FiCopy,
     FiVolume2,
 } from 'react-icons/fi';
+import { motion, AnimatePresence } from "framer-motion";
 import {
     TbRobot,
     TbMessageChatbot,
@@ -25,6 +26,7 @@ import {
 import { FiCpu, FiServer, FiAperture } from 'react-icons/fi';
 import Sidebar from './Sidebar';
 import ib from "../assets/ib2.png";
+import ib3 from "../assets/ib3.png";
 
 const ChatUI = ({
     messages,
@@ -70,6 +72,18 @@ const ChatUI = ({
 
     const formatTimestamp = () => {
         return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    };
+    const themeIconVariants = {
+        initial: { rotate: 0, scale: 1 },
+        hover: {
+            rotate: 180,
+            scale: 1.1,
+            transition: {
+                duration: 0.4,
+                ease: "easeInOut"
+            }
+        },
+        tap: { scale: 0.9 }
     };
 
     return (
@@ -148,20 +162,42 @@ const ChatUI = ({
                     </div>
 
                     {/* Theme Toggle */}
-                    <button
+                    <motion.button
+                        variants={themeIconVariants}
+                        initial="initial"
+                        whileHover="hover"
+                        whileTap="tap"
                         onClick={toggleTheme}
-                        className={`p-2.5 rounded-xl transition-all duration-300 hover:scale-105 ${isDarkMode
-                            ? "bg-gray-800 hover:bg-gray-700 border border-gray-700"
-                            : "bg-white hover:bg-gray-100 border border-gray-200 shadow-sm"
+                        className={`p-2.5 rounded-xl transition-all duration-300 relative overflow-hidden ${isDarkMode
+                                ? "bg-gray-800 hover:bg-gray-700 border border-gray-700"
+                                : "bg-white hover:bg-gray-100 border border-gray-200 shadow-sm"
                             }`}
                         title={isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
                     >
-                        {isDarkMode ? (
-                            <FiSun className="w-5 h-5 text-amber-400" />
-                        ) : (
-                            <FiMoon className="w-5 h-5 text-blue-600" />
-                        )}
-                    </button>
+                        <AnimatePresence mode="wait">
+                            {isDarkMode ? (
+                                <motion.div
+                                    key="sun"
+                                    initial={{ rotate: -180, opacity: 0 }}
+                                    animate={{ rotate: 0, opacity: 1 }}
+                                    exit={{ rotate: 180, opacity: 0 }}
+                                    transition={{ duration: 0.3 }}
+                                >
+                                    <FiSun className="w-5 h-5 text-amber-400" />
+                                </motion.div>
+                            ) : (
+                                <motion.div
+                                    key="moon"
+                                    initial={{ rotate: 180, opacity: 0 }}
+                                    animate={{ rotate: 0, opacity: 1 }}
+                                    exit={{ rotate: -180, opacity: 0 }}
+                                    transition={{ duration: 0.3 }}
+                                >
+                                    <FiMoon className="w-5 h-5 text-blue-600" />
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                    </motion.button>
                 </div>
             </div>
 
@@ -361,8 +397,11 @@ const ChatUI = ({
                                             <FiUser className={`w-5 h-5 ${isDarkMode ? "text-blue-400" : "text-blue-600"
                                                 }`} />
                                         ) : (
-                                            <TbRobot className={`w-5 h-5 ${isDarkMode ? "text-gray-400" : "text-gray-600"
-                                                }`} />
+                                            <img
+                                                src={ib3}
+                                                alt="Bot"
+                                                className="w-7 h-7 object-contain scale-125"
+                                            />
                                         )}
                                     </div>
 
@@ -381,7 +420,7 @@ const ChatUI = ({
                                                 ? (isDarkMode ? "text-blue-400" : "text-blue-600")
                                                 : (isDarkMode ? "text-gray-300" : "text-gray-700")
                                                 }`}>
-                                                {msg.sender === "user" ? "You" : "IndusBot AI"}
+                                                {msg.sender === "user" ? "You" : "IndusBot"}
                                             </span>
                                             <span className={`text-xs flex items-center gap-1 ${isDarkMode ? "text-gray-500" : "text-gray-400"
                                                 }`}>
@@ -431,8 +470,11 @@ const ChatUI = ({
                                         ? "bg-gray-800 border border-gray-700"
                                         : "bg-white border border-gray-200"
                                         }`}>
-                                        <TbRobot className={`w-5 h-5 animate-pulse ${isDarkMode ? "text-gray-400" : "text-gray-600"
-                                            }`} />
+                                        <img
+                                            src={ib3}
+                                            alt="Bot"
+                                            className="w-6 h-6 object-contain animate-pulse"
+                                        />
                                     </div>
                                     <div className={`flex-1 rounded-2xl p-5 ${isDarkMode
                                         ? "bg-gray-800/50 border border-gray-700"
