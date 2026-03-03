@@ -42,6 +42,7 @@ const Sidebar = ({ isOpen, toggleSidebar, isDarkMode, activePage, onNavigate, to
         { icon: <FiTool />, label: 'Maintenance' },
         { icon: <FiShield />, label: 'Security' },
         { icon: <FiHelpCircle />, label: 'Support' },
+        { icon: <FiSettings />, label: 'Settings', page: 'settings' },
     ];
 
     const recentChats = [
@@ -279,10 +280,12 @@ const Sidebar = ({ isOpen, toggleSidebar, isDarkMode, activePage, onNavigate, to
 
                             {/* Footer Actions */}
                             <div className="flex items-center gap-2">
-                                <button className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm transition-colors ${isDarkMode
-                                    ? "hover:bg-gray-800 text-gray-400"
-                                    : "hover:bg-gray-100 text-gray-600"
-                                    }`}>
+                                <button
+                                    onClick={() => onNavigate && onNavigate('settings')}
+                                    className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm transition-colors ${isDarkMode
+                                        ? "hover:bg-gray-800 text-gray-400"
+                                        : "hover:bg-gray-100 text-gray-600"
+                                        }`}>
                                     <FiSettings className="w-4 h-4" />
                                     Settings
                                 </button>
@@ -313,10 +316,12 @@ const Sidebar = ({ isOpen, toggleSidebar, isDarkMode, activePage, onNavigate, to
                             >
                                 {isDarkMode ? <FiSun className="w-5 h-5" /> : <FiMoon className="w-5 h-5" />}
                             </button>
-                            <button className={`p-2.5 rounded-lg ${isDarkMode
-                                ? "hover:bg-gray-800 text-gray-400"
-                                : "hover:bg-gray-100 text-gray-600"
-                                }`}>
+                            <button
+                                onClick={() => onNavigate && onNavigate('settings')}
+                                className={`p-2.5 rounded-lg ${isDarkMode
+                                    ? "hover:bg-gray-800 text-gray-400"
+                                    : "hover:bg-gray-100 text-gray-600"
+                                    }`}>
                                 <FiSettings className="w-5 h-5" />
                             </button>
                         </div>

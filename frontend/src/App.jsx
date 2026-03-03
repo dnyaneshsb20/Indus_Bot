@@ -5,6 +5,7 @@ import Sidebar from "./components/Sidebar";
 import StartupScreen from "./components/StartupScreen";
 import ChatSessions from "./components/ChatSessions";
 import MachineSettings from "./components/MachineSettings";
+import Settings from "./components/Settings";
 import LoginScreen from "./components/LoginScreen";
 
 function App() {
@@ -96,6 +97,14 @@ function App() {
           <MachineSettings
             isDarkMode={isDarkMode}
             onBack={() => setActivePage("dashboard")}
+          />
+        );
+      case 'settings':
+        return (
+          <Settings
+            isDarkMode={isDarkMode}
+            onBack={() => setActivePage("dashboard")}
+            toggleTheme={toggleTheme}
           />
         );
       case 'dashboard':
