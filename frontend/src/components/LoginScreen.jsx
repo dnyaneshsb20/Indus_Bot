@@ -18,6 +18,7 @@ const LoginScreen = ({ isDarkMode, onLogin }) => {
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState('');
+    const [showErrorPopup, setShowErrorPopup] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [inputFocused, setInputFocused] = useState(null);
 
@@ -31,6 +32,7 @@ const LoginScreen = ({ isDarkMode, onLogin }) => {
 
         if (!username.trim() || !password.trim()) {
             setError('Please enter both username and password');
+            setShowErrorPopup(true);
             return;
         }
 
@@ -43,8 +45,14 @@ const LoginScreen = ({ isDarkMode, onLogin }) => {
             onLogin();
         } else {
             setError('Invalid username or password');
+            setShowErrorPopup(true);
             setIsLoading(false);
         }
+    };
+
+    const dismissErrorPopup = () => {
+        setShowErrorPopup(false);
+        setError('');
     };
 
     return (
@@ -95,7 +103,7 @@ const LoginScreen = ({ isDarkMode, onLogin }) => {
             {/* Main Content */}
             <div className="relative z-10 h-full flex flex-col items-center justify-center px-4">
                 {/* Logo and Branding */}
-                <div className="text-center mb-5 animate-fade-up">
+                <div className="text-center mb-2 animate-fade-up">
                     <div className="relative inline-block mb-2">
                         {/* Pulsing glow */}
                         <div className={`absolute inset-0 rounded-full blur-xl ${isDarkMode
@@ -122,7 +130,7 @@ const LoginScreen = ({ isDarkMode, onLogin }) => {
                             IndusBot AI
                         </span>
                     </h1>
-                    <p className={`text-base font-medium ${isDarkMode ? "text-gray-400" : "text-gray-600"}`}>
+                    <p className={`text-lg font-medium ${isDarkMode ? "text-gray-400" : "text-gray-600"}`}>
                         Industrial Machine Intelligence Platform
                     </p>
                 </div>
@@ -136,14 +144,14 @@ const LoginScreen = ({ isDarkMode, onLogin }) => {
                 >
                     {/* Card Header */}
                     <div className={`px-6 py-4 border-b ${isDarkMode ? "border-gray-800" : "border-gray-200"}`}>
-                        <div className="flex items-center gap-3">
+                        <div className="flex flex-col items-center gap-1">
                             <div className={`p-3 rounded-xl ${isDarkMode
                                 ? "bg-gradient-to-br from-blue-900/30 to-cyan-900/30"
                                 : "bg-gradient-to-br from-blue-100 to-cyan-100"
                                 }`}>
-                                <FiShield className={`w-6 h-6 ${isDarkMode ? "text-blue-400" : "text-blue-600"}`} />
+                                <FiShield className={`w-5 h-5 ${isDarkMode ? "text-blue-400" : "text-blue-600"}`} />
                             </div>
-                            <div>
+                            <div className="text-center">
                                 <h2 className={`text-xl font-bold ${isDarkMode ? "text-white" : "text-gray-900"}`}>
                                     Secure Login
                                 </h2>
@@ -156,16 +164,7 @@ const LoginScreen = ({ isDarkMode, onLogin }) => {
 
                     {/* Login Form */}
                     <form onSubmit={handleLogin} className="p-6 space-y-4">
-                        {/* Error Message */}
-                        {error && (
-                            <div className={`flex items-center gap-3 p-3 rounded-xl text-sm animate-message-in ${isDarkMode
-                                ? "bg-red-900/20 text-red-400 border border-red-800/30"
-                                : "bg-red-50 text-red-600 border border-red-200"
-                                }`}>
-                                <FiAlertCircle className="w-5 h-5 flex-shrink-0" />
-                                {error}
-                            </div>
-                        )}
+
 
                         {/* Username Field */}
                         <div>
@@ -271,6 +270,56 @@ const LoginScreen = ({ isDarkMode, onLogin }) => {
                     </form>
                 </div>
 
+                {/* Error Popup Modal */}
+                {showErrorPopup && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center px-4"
+                        onClick={dismissErrorPopup}
+                    >
+                        {/* Backdrop */}
+                        <div className="absolute inset-0 bg-black/50 backdrop-blur-sm animate-fade-in" />
+
+                        {/* Popup Card */}
+                        <div
+                            className={`relative w-full max-w-sm rounded-2xl border p-6 shadow-2xl animate-scale-up ${isDarkMode
+                                ? "bg-gray-900 border-gray-700"
+                                : "bg-white border-gray-200"
+                                }`}
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <div className="flex flex-col items-center text-center gap-4">
+                                {/* Error Icon */}
+                                <div className={`p-4 rounded-full ${isDarkMode
+                                    ? "bg-red-900/30"
+                                    : "bg-red-100"
+                                    }`}>
+                                    <FiAlertCircle className={`w-8 h-8 ${isDarkMode ? "text-red-400" : "text-red-500"}`} />
+                                </div>
+
+                                {/* Error Title */}
+                                <h3 className={`text-lg font-bold ${isDarkMode ? "text-white" : "text-gray-900"}`}>
+                                    Authentication Failed
+                                </h3>
+
+                                {/* Error Message */}
+                                <p className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-500"}`}>
+                                    {error}
+                                </p>
+
+                                {/* Try Again Button */}
+                                <button
+                                    type="button"
+                                    onClick={dismissErrorPopup}
+                                    className={`w-full mt-2 py-3 rounded-xl font-semibold text-sm transition-all duration-300
+                                        hover:scale-[1.02] active:scale-[0.98]
+                                        bg-gradient-to-r from-blue-600 to-cyan-500 text-white
+                                        hover:shadow-lg hover:shadow-blue-500/25`}
+                                >
+                                    Try Again
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
 
             </div>
         </div>
