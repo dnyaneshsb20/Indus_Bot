@@ -1,8 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import {
     FiSend,
-    FiSun,
-    FiMoon,
     FiChevronDown,
     FiMessageSquare,
     FiSettings,
@@ -38,7 +36,6 @@ const ChatUI = ({
     selectedMachine,
     setSelectedMachine,
     isDarkMode,
-    toggleTheme,
 }) => {
     const isFirstLoad = messages.length === 0;
     const messagesEndRef = useRef(null);
@@ -73,18 +70,7 @@ const ChatUI = ({
     const formatTimestamp = () => {
         return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     };
-    const themeIconVariants = {
-        initial: { rotate: 0, scale: 1 },
-        hover: {
-            rotate: 180,
-            scale: 1.1,
-            transition: {
-                duration: 0.4,
-                ease: "easeInOut"
-            }
-        },
-        tap: { scale: 0.9 }
-    };
+
 
     return (
         <div className={`h-screen flex flex-col overflow-hidden transition-all duration-500 ${isDarkMode
@@ -92,7 +78,7 @@ const ChatUI = ({
             : "bg-gray-50 text-gray-900"
             }`}>
             {/* Top Navigation Bar */}
-            <div className={`sticky top-0 z-50 flex items-center justify-between px-6 py-2 border-b ${isDarkMode
+            <div className={`sticky top-0 z-50 flex items-center justify-between px-6 py-4 border-b ${isDarkMode
                 ? "bg-gray-900/80 backdrop-blur-sm border-gray-700"
                 : "bg-white/90 backdrop-blur-sm border-gray-200"
                 }`}>
@@ -109,7 +95,7 @@ const ChatUI = ({
                         />
                     </div>
                     <div>
-                        <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">
+                        <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">
                             IndusBot
                         </h1>
                         <p className={`text-xs ${isDarkMode ? "text-gray-400" : "text-gray-500"}`}>
@@ -160,44 +146,6 @@ const ChatUI = ({
                             </option>
                         </select>
                     </div>
-
-                    {/* Theme Toggle */}
-                    <motion.button
-                        variants={themeIconVariants}
-                        initial="initial"
-                        whileHover="hover"
-                        whileTap="tap"
-                        onClick={toggleTheme}
-                        className={`p-2.5 rounded-xl transition-all duration-300 relative overflow-hidden ${isDarkMode
-                                ? "bg-gray-800 hover:bg-gray-700 border border-gray-700"
-                                : "bg-white hover:bg-gray-100 border border-gray-200 shadow-sm"
-                            }`}
-                        title={isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
-                    >
-                        <AnimatePresence mode="wait">
-                            {isDarkMode ? (
-                                <motion.div
-                                    key="sun"
-                                    initial={{ rotate: -180, opacity: 0 }}
-                                    animate={{ rotate: 0, opacity: 1 }}
-                                    exit={{ rotate: 180, opacity: 0 }}
-                                    transition={{ duration: 0.3 }}
-                                >
-                                    <FiSun className="w-5 h-5 text-amber-400" />
-                                </motion.div>
-                            ) : (
-                                <motion.div
-                                    key="moon"
-                                    initial={{ rotate: 180, opacity: 0 }}
-                                    animate={{ rotate: 0, opacity: 1 }}
-                                    exit={{ rotate: -180, opacity: 0 }}
-                                    transition={{ duration: 0.3 }}
-                                >
-                                    <FiMoon className="w-5 h-5 text-blue-600" />
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
-                    </motion.button>
                 </div>
             </div>
 

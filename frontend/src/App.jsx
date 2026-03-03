@@ -3,6 +3,9 @@ import { askQuestion } from "./services/api";
 import ChatUI from "./components/ChatUI";
 import Sidebar from "./components/Sidebar";
 import StartupScreen from "./components/StartupScreen";
+import ChatSessions from "./components/ChatSessions";
+import MachineSettings from "./components/MachineSettings";
+import LoginScreen from "./components/LoginScreen";
 
 function App() {
   const [messages, setMessages] = useState([]);
@@ -14,16 +17,27 @@ function App() {
     return localStorage.getItem("darkMode") === "true";
   });
 
-  // ✅ Splash state
-  const [showStartup, setShowStartup] = useState(true);
+  // ✅ Auth & Splash states
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [showStartup, setShowStartup] = useState(false);
 
+  // ✅ Page navigation state
+  const [activePage, setActivePage] = useState("dashboard");
+
+  // Start the startup timer only after login
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowStartup(false);
-    }, 5500);
+    if (showStartup) {
+      const timer = setTimeout(() => {
+        setShowStartup(false);
+      }, 5500);
+      return () => clearTimeout(timer);
+    }
+  }, [showStartup]);
 
-    return () => clearTimeout(timer);
-  }, []);
+  const handleLogin = () => {
+    setIsLoggedIn(true);
+    setShowStartup(true);
+  };
 
   const toggleSidebar = () => {
     setIsSidebarOpen((prev) => !prev);
@@ -31,6 +45,10 @@ function App() {
 
   const toggleTheme = () => {
     setIsDarkMode((prev) => !prev);
+  };
+
+  const handleNavigate = (page) => {
+    setActivePage(page);
   };
 
   const sendMessage = async () => {
@@ -54,9 +72,49 @@ function App() {
     localStorage.setItem("darkMode", isDarkMode);
   }, [isDarkMode]);
 
+  // ✅ Flow: Login → Startup → Dashboard
+  if (!isLoggedIn) {
+    return <LoginScreen isDarkMode={isDarkMode} onLogin={handleLogin} />;
+  }
+
   if (showStartup) {
     return <StartupScreen isDarkMode={isDarkMode} />;
   }
+
+  // Render the active page content
+  const renderPage = () => {
+    switch (activePage) {
+      case 'chatSessions':
+        return (
+          <ChatSessions
+            isDarkMode={isDarkMode}
+            onBack={() => setActivePage("dashboard")}
+          />
+        );
+      case 'machineSettings':
+        return (
+          <MachineSettings
+            isDarkMode={isDarkMode}
+            onBack={() => setActivePage("dashboard")}
+          />
+        );
+      case 'dashboard':
+      default:
+        return (
+          <ChatUI
+            messages={messages}
+            question={question}
+            setQuestion={setQuestion}
+            sendMessage={sendMessage}
+            loading={loading}
+            isSidebarOpen={isSidebarOpen}
+            selectedMachine={selectedMachine}
+            setSelectedMachine={setSelectedMachine}
+            isDarkMode={isDarkMode}
+          />
+        );
+    }
+  };
 
   return (
     <div className="h-screen flex">
@@ -64,24 +122,17 @@ function App() {
         isOpen={isSidebarOpen}
         toggleSidebar={toggleSidebar}
         isDarkMode={isDarkMode}
+        activePage={activePage}
+        onNavigate={handleNavigate}
+        toggleTheme={toggleTheme}
       />
 
       <div className="flex-1 relative">
-        <ChatUI
-          messages={messages}
-          question={question}
-          setQuestion={setQuestion}
-          sendMessage={sendMessage}
-          loading={loading}
-          isSidebarOpen={isSidebarOpen}
-          selectedMachine={selectedMachine}
-          setSelectedMachine={setSelectedMachine}
-          isDarkMode={isDarkMode}
-          toggleTheme={toggleTheme}
-        />
+        {renderPage()}
       </div>
     </div>
   );
 }
 
 export default App;
+

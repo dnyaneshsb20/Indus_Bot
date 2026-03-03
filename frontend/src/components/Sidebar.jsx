@@ -14,7 +14,10 @@ import {
     FiUpload,
     FiShield,
     FiTool,
-    FiChevronRight  // Added this missing import
+    FiChevronRight,
+    FiMessageSquare,
+    FiMoon,
+    FiSun
 } from 'react-icons/fi';
 import {
     TbRobot,
@@ -24,12 +27,12 @@ import {
 } from 'react-icons/tb';
 import ib from "../assets/ib2.png";
 
-const Sidebar = ({ isOpen, toggleSidebar, isDarkMode }) => {
+const Sidebar = ({ isOpen, toggleSidebar, isDarkMode, activePage, onNavigate, toggleTheme }) => {
     const menuItems = [
-        { icon: <FiHome />, label: 'Dashboard', active: true },
-        { icon: <TbRobot />, label: 'Chat Sessions' },
+        { icon: <FiHome />, label: 'Dashboard', page: 'dashboard' },
+        { icon: <FiMessageSquare />, label: 'Chat Sessions', page: 'chatSessions' },
         { icon: <FiFileText />, label: 'Documentation' },
-        { icon: <FiSettings />, label: 'Machine Settings' },
+        { icon: <FiSettings />, label: 'Machine Settings', page: 'machineSettings' },
         { icon: <TbDatabase />, label: 'Knowledge Base' },
         { icon: <FiBarChart2 />, label: 'Analytics' },
         { icon: <FiUsers />, label: 'Team Members' },
@@ -67,7 +70,7 @@ const Sidebar = ({ isOpen, toggleSidebar, isDarkMode }) => {
                 `}
             >
                 {/* Header */}
-                <div className={`p-2 flex items-center justify-between border-b ${isDarkMode ? "border-gray-800" : "border-gray-200"
+                <div className={`p-4 flex items-center justify-between border-b ${isDarkMode ? "border-gray-800" : "border-gray-200"
                     }`}>
                     {/* Logo Section */}
                     <div className={`flex items-center gap-2 ${!isOpen && "justify-center w-full"
@@ -128,8 +131,9 @@ const Sidebar = ({ isOpen, toggleSidebar, isDarkMode }) => {
                             {menuItems.slice(0, 5).map((item, index) => (
                                 <li key={index}>
                                     <button
+                                        onClick={() => item.page && onNavigate && onNavigate(item.page)}
                                         className={`flex items-center w-full px-3 py-3 rounded-xl transition-all duration-200 group ${isOpen ? "justify-start gap-3" : "justify-center"
-                                            } ${item.active
+                                            } ${activePage === item.page
                                                 ? isDarkMode
                                                     ? "bg-blue-900/30 text-blue-400 border border-blue-800/30"
                                                     : "bg-blue-50 text-blue-600 border border-blue-200"
@@ -138,7 +142,7 @@ const Sidebar = ({ isOpen, toggleSidebar, isDarkMode }) => {
                                                     : "hover:bg-gray-100 text-gray-600 hover:text-gray-900"
                                             }`}
                                     >
-                                        <span className={`transition-transform group-hover:scale-110 ${item.active ? "text-blue-500" : ""
+                                        <span className={`transition-transform group-hover:scale-110 ${activePage === item.page ? "text-blue-500" : ""
                                             }`}>
                                             {item.icon}
                                         </span>
@@ -147,7 +151,7 @@ const Sidebar = ({ isOpen, toggleSidebar, isDarkMode }) => {
                                                 {item.label}
                                             </span>
                                         )}
-                                        {item.active && isOpen && (
+                                        {activePage === item.page && isOpen && (
                                             <span className={`w-2 h-2 rounded-full ${isDarkMode ? "bg-blue-500" : "bg-blue-600"
                                                 }`}></span>
                                         )}
@@ -255,6 +259,24 @@ const Sidebar = ({ isOpen, toggleSidebar, isDarkMode }) => {
                                 </div>
                             </div>
 
+                            {/* Dark Mode Toggle */}
+                            <div className={`flex items-center justify-between px-1 py-2 rounded-lg ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                                <div className="flex items-center gap-2">
+                                    <FiMoon className={`w-4 h-4 ${isDarkMode ? 'text-blue-400' : 'text-gray-500'}`} />
+                                    <span className="text-sm font-medium">Dark Mode</span>
+                                </div>
+                                <button
+                                    onClick={toggleTheme}
+                                    className={`relative w-11 h-6 rounded-full transition-colors duration-300 ${isDarkMode
+                                        ? 'bg-blue-600'
+                                        : 'bg-gray-300'
+                                        }`}
+                                >
+                                    <div className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow-md transition-transform duration-300 ${isDarkMode ? 'translate-x-5' : 'translate-x-0'
+                                        }`}></div>
+                                </button>
+                            </div>
+
                             {/* Footer Actions */}
                             <div className="flex items-center gap-2">
                                 <button className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm transition-colors ${isDarkMode
@@ -281,6 +303,16 @@ const Sidebar = ({ isOpen, toggleSidebar, isDarkMode }) => {
                                     DB
                                 </span>
                             </div>
+                            <button
+                                onClick={toggleTheme}
+                                className={`p-2.5 rounded-lg transition-colors ${isDarkMode
+                                    ? "hover:bg-gray-800 text-blue-400"
+                                    : "hover:bg-gray-100 text-gray-600"
+                                    }`}
+                                title={isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
+                            >
+                                {isDarkMode ? <FiSun className="w-5 h-5" /> : <FiMoon className="w-5 h-5" />}
+                            </button>
                             <button className={`p-2.5 rounded-lg ${isDarkMode
                                 ? "hover:bg-gray-800 text-gray-400"
                                 : "hover:bg-gray-100 text-gray-600"
