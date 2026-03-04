@@ -12,6 +12,7 @@ import {
     FiShield
 } from 'react-icons/fi';
 import ib from "../assets/ib2.png";
+import ChangePasswordModal from './ChangePasswordModal';
 
 const LoginScreen = ({ isDarkMode, onLogin }) => {
     const [username, setUsername] = useState('');
@@ -21,10 +22,11 @@ const LoginScreen = ({ isDarkMode, onLogin }) => {
     const [showErrorPopup, setShowErrorPopup] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [inputFocused, setInputFocused] = useState(null);
+    const [showForgotPassword, setShowForgotPassword] = useState(false);
 
-    // Hardcoded credentials for demo
+    // Hardcoded credentials for demo (password can be updated via Change Password flow)
     const VALID_USERNAME = 'admin';
-    const VALID_PASSWORD = 'admin123';
+    const VALID_PASSWORD = localStorage.getItem('userPassword') || 'admin123';
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -261,6 +263,20 @@ const LoginScreen = ({ isDarkMode, onLogin }) => {
                             )}
                         </button>
 
+                        {/* Forgot Password Link */}
+                        <div className="text-center pt-1">
+                            <button
+                                type="button"
+                                onClick={() => setShowForgotPassword(true)}
+                                className={`text-sm font-medium transition-colors ${isDarkMode
+                                    ? 'text-blue-400 hover:text-blue-300'
+                                    : 'text-blue-600 hover:text-blue-500'
+                                    }`}
+                            >
+                                Forgot Password?
+                            </button>
+                        </div>
+
                         {/* Demo Credentials Hint */}
                         <div className={`text-center pt-1 ${isDarkMode ? "text-gray-500" : "text-gray-400"}`}>
                             <p className="text-xs">
@@ -320,6 +336,14 @@ const LoginScreen = ({ isDarkMode, onLogin }) => {
                         </div>
                     </div>
                 )}
+
+                {/* Change Password Modal */}
+                <ChangePasswordModal
+                    isOpen={showForgotPassword}
+                    onClose={() => setShowForgotPassword(false)}
+                    isDarkMode={isDarkMode}
+                    onPasswordChanged={() => setShowForgotPassword(false)}
+                />
 
             </div>
         </div>

@@ -3,136 +3,189 @@
 @tailwind utilities;
 
 @keyframes gradient {
-    0%, 100% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
+
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
 }
 
 @keyframes float {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-10px); }
+
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
 }
 
 @keyframes typing {
-    0%, 60%, 100% { transform: translateY(0); }
-    30% { transform: translateY(-6px); }
+
+  0%,
+  60%,
+  100% {
+    transform: translateY(0);
+  }
+
+  30% {
+    transform: translateY(-6px);
+  }
 }
 
 @keyframes orbit {
-    from { transform: rotate(0deg) translateX(60px) rotate(0deg); }
-    to { transform: rotate(360deg) translateX(60px) rotate(-360deg); }
+  from {
+    transform: rotate(0deg) translateX(60px) rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg) translateX(60px) rotate(-360deg);
+  }
 }
 
 @keyframes slide-in {
-    from { 
-        opacity: 0;
-        transform: translateX(20px);
-    }
-    to { 
-        opacity: 1;
-        transform: translateX(0);
-    }
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 @keyframes message-in {
-    from { 
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to { 
-        opacity: 1;
-        transform: translateY(0);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes fade-in {
-    from { opacity: 0; }
-    to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes pulse-glow {
-    0%, 100% { opacity: 0.5; }
-    50% { opacity: 1; }
+
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+
+  50% {
+    opacity: 1;
+  }
 }
 
 /* Tailwind animations */
 .animate-gradient {
-    background-size: 200% 200%;
-    animation: gradient 3s ease infinite;
+  background-size: 200% 200%;
+  animation: gradient 3s ease infinite;
 }
 
 .animate-float {
-    animation: float 3s ease-in-out infinite;
+  animation: float 3s ease-in-out infinite;
 }
 
 .animate-slide-in {
-    animation: slide-in 0.5s ease-out;
+  animation: slide-in 0.5s ease-out;
 }
 
 .animate-message-in {
-    animation: message-in 0.3s ease-out;
+  animation: message-in 0.3s ease-out;
 }
 
 .animate-fade-in {
-    animation: fade-in 0.5s ease-out;
+  animation: fade-in 0.5s ease-out;
 }
 
 @keyframes slideIn {
-    from {
-        opacity: 0;
-        transform: translateX(-20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 .animate-slide-in {
-    animation: slideIn 0.3s ease-out;
+  animation: slideIn 0.3s ease-out;
 }
 
 .animate-fade-in {
-    animation: fadeIn 0.3s ease-out;
+  animation: fadeIn 0.3s ease-out;
 }
 
 /* Smooth sidebar transitions */
 .sidebar-enter {
-    transform: translateX(-100%);
+  transform: translateX(-100%);
 }
 
 .sidebar-enter-active {
-    transform: translateX(0);
-    transition: transform 300ms ease-in-out;
+  transform: translateX(0);
+  transition: transform 300ms ease-in-out;
 }
 
 .sidebar-exit {
-    transform: translateX(0);
+  transform: translateX(0);
 }
 
 .sidebar-exit-active {
-    transform: translateX(-100%);
-    transition: transform 300ms ease-in-out;
+  transform: translateX(-100%);
+  transition: transform 300ms ease-in-out;
 }
 
 @keyframes float {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translateY(0) rotate(0deg);
   }
+
   50% {
     transform: translateY(-20px) rotate(5deg);
   }
 }
 
 @keyframes glow {
-  0%, 100% {
+
+  0%,
+  100% {
     opacity: 0.5;
     transform: scale(1);
   }
+
   50% {
     opacity: 0.8;
     transform: scale(1.05);
@@ -143,9 +196,11 @@
   0% {
     background-position: 0% 50%;
   }
+
   50% {
     background-position: 100% 50%;
   }
+
   100% {
     background-position: 0% 50%;
   }
@@ -156,6 +211,7 @@
     opacity: 0;
     transform: translateY(30px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -166,24 +222,31 @@
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
 }
 
 @keyframes bounce-slow {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translateY(0);
   }
+
   50% {
     transform: translateY(-10px);
   }
 }
 
 @keyframes pulse-subtle {
-  0%, 100% {
+
+  0%,
+  100% {
     opacity: 1;
   }
+
   50% {
     opacity: 0.7;
   }
@@ -193,6 +256,7 @@
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -233,11 +297,13 @@
   animation: fade-in 0.8s ease-out forwards;
   opacity: 0;
 }
+
 @keyframes fade-up {
   from {
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -249,6 +315,7 @@
     opacity: 0;
     transform: scale(0.95);
   }
+
   to {
     opacity: 1;
     transform: scale(1);
@@ -259,6 +326,7 @@
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
@@ -268,21 +336,27 @@
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
 }
 
 @keyframes float-circuit {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translate(0, 0) rotate(0deg);
   }
+
   25% {
     transform: translate(10px, -10px) rotate(5deg);
   }
+
   50% {
     transform: translate(0, -20px) rotate(0deg);
   }
+
   75% {
     transform: translate(-10px, -10px) rotate(-5deg);
   }
@@ -292,6 +366,7 @@
   0% {
     transform: translateX(-100%);
   }
+
   100% {
     transform: translateX(100%);
   }
@@ -302,10 +377,12 @@
     transform: scale(1);
     opacity: 0.5;
   }
+
   50% {
     transform: scale(1.05);
     opacity: 1;
   }
+
   100% {
     transform: scale(1);
     opacity: 1;
@@ -316,9 +393,11 @@
   0% {
     background-position: 0% 50%;
   }
+
   50% {
     background-position: 100% 50%;
   }
+
   100% {
     background-position: 0% 50%;
   }
@@ -359,11 +438,13 @@
   animation: gradient 3s ease infinite;
   background-size: 200% 200%;
 }
+
 @keyframes fade-up {
   from {
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -375,6 +456,7 @@
     opacity: 0;
     transform: scale(0.95);
   }
+
   to {
     opacity: 1;
     transform: scale(1);
@@ -385,21 +467,27 @@
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
 }
 
 @keyframes float {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translate(0, 0) rotate(0deg);
   }
+
   25% {
     transform: translate(10px, -10px) rotate(5deg);
   }
+
   50% {
     transform: translate(0, -20px) rotate(0deg);
   }
+
   75% {
     transform: translate(-10px, -10px) rotate(-5deg);
   }
@@ -409,6 +497,7 @@
   0% {
     transform: translateY(-100%);
   }
+
   100% {
     transform: translateY(100%);
   }
@@ -418,9 +507,11 @@
   0% {
     background-position: 0% 50%;
   }
+
   50% {
     background-position: 100% 50%;
   }
+
   100% {
     background-position: 0% 50%;
   }
@@ -453,8 +544,129 @@
   animation: gradient 3s ease infinite;
   background-size: 200% 200%;
 }
+
 /* For Chrome, Edge, Safari */
 ::-webkit-scrollbar {
   width: 0px;
   background: transparent;
+}
+
+/* ===== APPEARANCE SETTINGS - FUNCTIONAL STYLES ===== */
+
+/* Font Size Variable */
+:root {
+  --app-font-size: 16px;
+}
+
+/* No Animations Mode — disables ALL animations & transitions globally */
+.no-animations,
+.no-animations * {
+  animation: none !important;
+  transition: none !important;
+  opacity: unset;
+}
+
+/* Force visibility for elements that start at opacity: 0 */
+.no-animations .animate-fade-in,
+.no-animations .animate-fade-up,
+.no-animations .animate-scale-up,
+.no-animations .animate-slide-up,
+.no-animations .animate-message-in,
+.no-animations .animate-slide-in,
+.no-animations .animate-module-load {
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+/* Stop decorative/looping animations */
+.no-animations .animate-pulse,
+.no-animations .animate-spin,
+.no-animations .animate-bounce,
+.no-animations .animate-float,
+.no-animations .animate-glow,
+.no-animations .animate-gradient,
+.no-animations .animate-spin-slow,
+.no-animations .animate-bounce-slow,
+.no-animations .animate-pulse-subtle,
+.no-animations .animate-rotate-slow,
+.no-animations .animate-float-circuit,
+.no-animations .animate-scan,
+.no-animations .animate-scan-vertical {
+  animation: none !important;
+}
+
+/* Compact Mode — reduces spacing app-wide for denser UI */
+.compact-mode .p-6 {
+  padding: 0.75rem !important;
+}
+
+.compact-mode .p-5 {
+  padding: 0.625rem !important;
+}
+
+.compact-mode .p-4 {
+  padding: 0.5rem !important;
+}
+
+.compact-mode .px-6 {
+  padding-left: 0.75rem !important;
+  padding-right: 0.75rem !important;
+}
+
+.compact-mode .py-4 {
+  padding-top: 0.5rem !important;
+  padding-bottom: 0.5rem !important;
+}
+
+.compact-mode .py-3 {
+  padding-top: 0.375rem !important;
+  padding-bottom: 0.375rem !important;
+}
+
+.compact-mode .gap-6 {
+  gap: 0.75rem !important;
+}
+
+.compact-mode .gap-4 {
+  gap: 0.5rem !important;
+}
+
+.compact-mode .gap-3 {
+  gap: 0.375rem !important;
+}
+
+.compact-mode .space-y-6>*+* {
+  margin-top: 0.75rem !important;
+}
+
+.compact-mode .space-y-3>*+* {
+  margin-top: 0.375rem !important;
+}
+
+.compact-mode .mb-6 {
+  margin-bottom: 0.75rem !important;
+}
+
+.compact-mode .mb-4 {
+  margin-bottom: 0.5rem !important;
+}
+
+.compact-mode .mb-3 {
+  margin-bottom: 0.375rem !important;
+}
+
+.compact-mode .text-2xl {
+  font-size: 1.25rem !important;
+}
+
+.compact-mode .text-4xl {
+  font-size: 1.75rem !important;
+}
+
+.compact-mode .rounded-2xl {
+  border-radius: 0.75rem !important;
+}
+
+.compact-mode .rounded-xl {
+  border-radius: 0.5rem !important;
 }

@@ -36,7 +36,74 @@ const ChatUI = ({
     selectedMachine,
     setSelectedMachine,
     isDarkMode,
+    appearance = {},
 }) => {
+    const chatBubbleStyle = appearance.chatBubbleStyle || 'modern';
+
+    // Chat bubble style configurations
+    const getBubbleClasses = (sender) => {
+        const isUser = sender === 'user';
+        switch (chatBubbleStyle) {
+            case 'classic':
+                return {
+                    container: `rounded-lg p-4 ${isUser
+                        ? (isDarkMode
+                            ? 'bg-blue-700 border border-blue-600'
+                            : 'bg-blue-500 text-white border border-blue-400')
+                        : (isDarkMode
+                            ? 'bg-gray-800 border border-gray-700'
+                            : 'bg-white border border-gray-300 shadow-sm')
+                        }`,
+                    header: isUser
+                        ? (isDarkMode ? 'text-blue-200' : 'text-blue-100')
+                        : (isDarkMode ? 'text-gray-300' : 'text-gray-700'),
+                    text: isUser
+                        ? (isDarkMode ? 'text-gray-100' : 'text-white')
+                        : (isDarkMode ? 'text-gray-200' : 'text-gray-700'),
+                    actions: isUser
+                        ? (isDarkMode ? 'border-blue-600/30' : 'border-blue-300/50')
+                        : (isDarkMode ? 'border-gray-700/30' : 'border-gray-200'),
+                    actionBtn: isUser
+                        ? (isDarkMode ? 'hover:bg-blue-600/50 text-blue-200' : 'hover:bg-blue-400/50 text-blue-100')
+                        : (isDarkMode ? 'hover:bg-gray-700/50 text-gray-400' : 'hover:bg-gray-100 text-gray-500'),
+                };
+            case 'minimal':
+                return {
+                    container: `rounded-xl px-4 py-3 ${isUser
+                        ? (isDarkMode
+                            ? 'bg-transparent border-l-2 border-blue-500 pl-4'
+                            : 'bg-transparent border-l-2 border-blue-500 pl-4')
+                        : (isDarkMode
+                            ? 'bg-transparent'
+                            : 'bg-transparent')
+                        }`,
+                    header: isUser
+                        ? (isDarkMode ? 'text-blue-400' : 'text-blue-600')
+                        : (isDarkMode ? 'text-gray-400' : 'text-gray-500'),
+                    text: isDarkMode ? 'text-gray-200' : 'text-gray-700',
+                    actions: isDarkMode ? 'border-gray-800/30' : 'border-gray-100',
+                    actionBtn: isDarkMode ? 'hover:bg-gray-800/50 text-gray-500' : 'hover:bg-gray-100 text-gray-400',
+                };
+            case 'modern':
+            default:
+                return {
+                    container: `rounded-2xl p-5 ${isUser
+                        ? (isDarkMode
+                            ? 'bg-gradient-to-r from-blue-800/30 to-cyan-800/30 border border-blue-700/30'
+                            : 'bg-gradient-to-r from-blue-50 to-cyan-50 border border-blue-200')
+                        : (isDarkMode
+                            ? 'bg-gray-800/50 border border-gray-700'
+                            : 'bg-white border border-gray-200 shadow-sm')
+                        }`,
+                    header: isUser
+                        ? (isDarkMode ? 'text-blue-400' : 'text-blue-600')
+                        : (isDarkMode ? 'text-gray-300' : 'text-gray-700'),
+                    text: isDarkMode ? 'text-gray-200' : 'text-gray-700',
+                    actions: 'border-gray-800/20',
+                    actionBtn: isDarkMode ? 'hover:bg-gray-700/50 text-gray-400' : 'hover:bg-gray-100 text-gray-500',
+                };
+        }
+    };
     const isFirstLoad = messages.length === 0;
     const messagesEndRef = useRef(null);
     const [inputFocused, setInputFocused] = useState(false);
@@ -326,90 +393,73 @@ const ChatUI = ({
                             ? "bg-gray-900/50"
                             : "bg-gray-50"
                             }`}>
-                            {messages.map((msg, i) => (
-                                <div
-                                    key={i}
-                                    className={`animate-message-in flex gap-4 max-w-3xl mx-auto ${msg.sender === "user" ? "ml-auto" : "mr-auto"
-                                        }`}
-                                >
-                                    {/* Avatar */}
-                                    <div className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center ${msg.sender === "user"
-                                        ? (isDarkMode
-                                            ? "bg-blue-900/50 border border-blue-800/50"
-                                            : "bg-blue-100 border border-blue-200")
-                                        : (isDarkMode
-                                            ? "bg-gray-800 border border-gray-700"
-                                            : "bg-white border border-gray-200")
-                                        }`}>
-                                        {msg.sender === "user" ? (
-                                            <FiUser className={`w-5 h-5 ${isDarkMode ? "text-blue-400" : "text-blue-600"
-                                                }`} />
-                                        ) : (
-                                            <img
-                                                src={ib3}
-                                                alt="Bot"
-                                                className="w-7 h-7 object-contain scale-125"
-                                            />
-                                        )}
-                                    </div>
-
-                                    {/* Message Content */}
-                                    <div className={`flex-1 rounded-2xl p-5 ${msg.sender === "user"
-                                        ? (isDarkMode
-                                            ? "bg-gradient-to-r from-blue-800/30 to-cyan-800/30 border border-blue-700/30"
-                                            : "bg-gradient-to-r from-blue-50 to-cyan-50 border border-blue-200")
-                                        : (isDarkMode
-                                            ? "bg-gray-800/50 border border-gray-700"
-                                            : "bg-white border border-gray-200 shadow-sm")
-                                        }`}>
-                                        {/* Message Header */}
-                                        <div className="flex items-center justify-between mb-3">
-                                            <span className={`text-sm font-semibold ${msg.sender === "user"
-                                                ? (isDarkMode ? "text-blue-400" : "text-blue-600")
-                                                : (isDarkMode ? "text-gray-300" : "text-gray-700")
-                                                }`}>
-                                                {msg.sender === "user" ? "You" : "IndusBot"}
-                                            </span>
-                                            <span className={`text-xs flex items-center gap-1 ${isDarkMode ? "text-gray-500" : "text-gray-400"
-                                                }`}>
-                                                <FiClock className="w-3 h-3" />
-                                                {formatTimestamp()}
-                                            </span>
-                                        </div>
-
-                                        {/* Message Text */}
-                                        <div className={`leading-relaxed ${isDarkMode ? "text-gray-200" : "text-gray-700"
+                            {messages.map((msg, i) => {
+                                const bubble = getBubbleClasses(msg.sender);
+                                return (
+                                    <div
+                                        key={i}
+                                        className={`animate-message-in flex gap-4 max-w-3xl mx-auto ${msg.sender === "user" ? "ml-auto" : "mr-auto"
+                                            }`}
+                                    >
+                                        {/* Avatar */}
+                                        <div className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center ${msg.sender === "user"
+                                            ? (isDarkMode
+                                                ? "bg-blue-900/50 border border-blue-800/50"
+                                                : "bg-blue-100 border border-blue-200")
+                                            : (isDarkMode
+                                                ? "bg-gray-800 border border-gray-700"
+                                                : "bg-white border border-gray-200")
                                             }`}>
-                                            {msg.text}
+                                            {msg.sender === "user" ? (
+                                                <FiUser className={`w-5 h-5 ${isDarkMode ? "text-blue-400" : "text-blue-600"
+                                                    }`} />
+                                            ) : (
+                                                <img
+                                                    src={ib3}
+                                                    alt="Bot"
+                                                    className="w-7 h-7 object-contain scale-125"
+                                                />
+                                            )}
                                         </div>
 
-                                        {/* Message Actions */}
-                                        <div className="flex items-center gap-2 mt-4 pt-3 border-t border-gray-800/20">
-                                            <button className={`flex items-center gap-1 text-xs px-3 py-1.5 rounded-lg transition-colors ${isDarkMode
-                                                ? "hover:bg-gray-700/50 text-gray-400"
-                                                : "hover:bg-gray-100 text-gray-500"
-                                                }`}>
-                                                <FiCopy className="w-3 h-3" />
-                                                Copy
-                                            </button>
-                                            <button className={`flex items-center gap-1 text-xs px-3 py-1.5 rounded-lg transition-colors ${isDarkMode
-                                                ? "hover:bg-gray-700/50 text-gray-400"
-                                                : "hover:bg-gray-100 text-gray-500"
-                                                }`}>
-                                                <FiVolume2 className="w-3 h-3" />
-                                                Speak
-                                            </button>
-                                            <button className={`flex items-center gap-1 text-xs px-3 py-1.5 rounded-lg transition-colors ${isDarkMode
-                                                ? "hover:bg-gray-700/50 text-gray-400"
-                                                : "hover:bg-gray-100 text-gray-500"
-                                                }`}>
-                                                <FiDownload className="w-3 h-3" />
-                                                Save
-                                            </button>
+                                        {/* Message Content — uses dynamic bubble style */}
+                                        <div className={`flex-1 ${bubble.container}`}>
+                                            {/* Message Header */}
+                                            <div className="flex items-center justify-between mb-3">
+                                                <span className={`text-sm font-semibold ${bubble.header}`}>
+                                                    {msg.sender === "user" ? "You" : "IndusBot"}
+                                                </span>
+                                                <span className={`text-xs flex items-center gap-1 ${isDarkMode ? "text-gray-500" : "text-gray-400"
+                                                    }`}>
+                                                    <FiClock className="w-3 h-3" />
+                                                    {formatTimestamp()}
+                                                </span>
+                                            </div>
+
+                                            {/* Message Text */}
+                                            <div className={`leading-relaxed ${bubble.text}`}>
+                                                {msg.text}
+                                            </div>
+
+                                            {/* Message Actions */}
+                                            <div className={`flex items-center gap-2 mt-4 pt-3 border-t ${bubble.actions}`}>
+                                                <button className={`flex items-center gap-1 text-xs px-3 py-1.5 rounded-lg transition-colors ${bubble.actionBtn}`}>
+                                                    <FiCopy className="w-3 h-3" />
+                                                    Copy
+                                                </button>
+                                                <button className={`flex items-center gap-1 text-xs px-3 py-1.5 rounded-lg transition-colors ${bubble.actionBtn}`}>
+                                                    <FiVolume2 className="w-3 h-3" />
+                                                    Speak
+                                                </button>
+                                                <button className={`flex items-center gap-1 text-xs px-3 py-1.5 rounded-lg transition-colors ${bubble.actionBtn}`}>
+                                                    <FiDownload className="w-3 h-3" />
+                                                    Save
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            ))}
+                                );
+                            })}
 
                             {/* Typing Indicator */}
                             {loading && (
