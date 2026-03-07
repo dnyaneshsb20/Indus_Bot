@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
     FiSearch,
     FiPlus,
@@ -6,259 +6,658 @@ import {
     FiClock,
     FiTrash2,
     FiChevronRight,
+    FiArrowLeft,
+    FiArchive,
+    FiCheckCircle,
+    FiAlertCircle,
+    FiCpu,
+    FiCalendar,
+    FiMessageCircle,
+    FiMoreVertical,
     FiFilter,
-    FiArrowLeft
+    FiX
 } from 'react-icons/fi';
-import { TbRobot } from 'react-icons/tb';
+import { TbRobot, TbDeviceAnalytics } from 'react-icons/tb';
+import { MdOutlineSmartToy } from 'react-icons/md';
+import { BsChatDots } from 'react-icons/bs';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const ChatSessions = ({ isDarkMode, onBack }) => {
     const [searchQuery, setSearchQuery] = useState('');
     const [activeFilter, setActiveFilter] = useState('all');
+    const [selectedSession, setSelectedSession] = useState(null);
+    const [showMobileFilters, setShowMobileFilters] = useState(false);
+    const [isLoaded, setIsLoaded] = useState(false);
+
+    useEffect(() => {
+        setIsLoaded(true);
+    }, []);
 
     const sessions = [
         {
             id: 1,
             title: 'Error E-102 Troubleshooting',
-            lastMessage: 'The error was resolved by recalibrating the sensor module...',
+            lastMessage: 'The error was resolved by recalibrating the sensor module with precision alignment tools...',
             time: '10:30 AM',
             date: 'Today',
             messages: 12,
             status: 'active',
-            machine: 'CNC Mill #3'
+            machine: 'CNC Mill #3',
+            priority: 'high',
+            participants: 2,
+            lastActive: '2 minutes ago'
         },
         {
             id: 2,
             title: 'Machine Calibration Guide',
-            lastMessage: 'Follow these steps to calibrate the X-axis alignment...',
+            lastMessage: 'Follow these steps to calibrate the X-axis alignment for optimal performance and accuracy...',
             time: '2:15 PM',
             date: 'Yesterday',
             messages: 8,
             status: 'completed',
-            machine: 'Lathe #1'
+            machine: 'Lathe #1',
+            priority: 'medium',
+            participants: 3,
+            lastActive: '1 day ago'
         },
         {
             id: 3,
             title: 'Safety Protocol Review',
-            lastMessage: 'All safety checks have been verified and documented...',
+            lastMessage: 'All safety checks have been verified and documented according to ISO standards...',
             time: '9:00 AM',
             date: 'Yesterday',
             messages: 15,
             status: 'completed',
-            machine: 'Press #2'
+            machine: 'Press #2',
+            priority: 'high',
+            participants: 4,
+            lastActive: '1 day ago'
         },
         {
             id: 4,
             title: 'Preventive Maintenance Schedule',
-            lastMessage: 'Next maintenance window is scheduled for March 10...',
+            lastMessage: 'Next maintenance window is scheduled for March 10 with complete system overhaul...',
             time: '4:45 PM',
             date: 'Mar 1',
             messages: 6,
             status: 'archived',
-            machine: 'CNC Mill #1'
+            machine: 'CNC Mill #1',
+            priority: 'low',
+            participants: 2,
+            lastActive: '3 days ago'
         },
         {
             id: 5,
             title: 'Oil Pressure Warning Analysis',
-            lastMessage: 'The oil pressure readings indicate normal operation...',
+            lastMessage: 'The oil pressure readings indicate normal operation within acceptable parameters...',
             time: '11:20 AM',
             date: 'Mar 1',
             messages: 9,
             status: 'completed',
-            machine: 'Hydraulic Press #1'
+            machine: 'Hydraulic Press #1',
+            priority: 'medium',
+            participants: 3,
+            lastActive: '2 days ago'
         },
         {
             id: 6,
             title: 'New Operator Training Queries',
-            lastMessage: 'Refer to section 4.2 of the operator manual for...',
+            lastMessage: 'Refer to section 4.2 of the operator manual for detailed instructions on machine startup...',
             time: '3:30 PM',
             date: 'Feb 28',
             messages: 22,
             status: 'archived',
-            machine: 'Assembly Line #2'
+            machine: 'Assembly Line #2',
+            priority: 'low',
+            participants: 5,
+            lastActive: '5 days ago'
         },
     ];
 
     const filters = [
-        { key: 'all', label: 'All' },
-        { key: 'active', label: 'Active' },
-        { key: 'completed', label: 'Completed' },
-        { key: 'archived', label: 'Archived' },
+        { key: 'all', label: 'All', icon: FiMessageSquare },
+        { key: 'active', label: 'Active', icon: FiAlertCircle },
+        { key: 'completed', label: 'Completed', icon: FiCheckCircle },
+        { key: 'archived', label: 'Archived', icon: FiArchive },
     ];
 
     const filteredSessions = sessions.filter(session => {
         const matchesSearch = session.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            session.machine.toLowerCase().includes(searchQuery.toLowerCase());
+            session.machine.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            session.lastMessage.toLowerCase().includes(searchQuery.toLowerCase());
         const matchesFilter = activeFilter === 'all' || session.status === activeFilter;
         return matchesSearch && matchesFilter;
     });
 
     const getStatusColor = (status) => {
         switch (status) {
-            case 'active': return 'bg-green-500';
-            case 'completed': return 'bg-blue-500';
-            case 'archived': return 'bg-gray-400';
-            default: return 'bg-gray-400';
+            case 'active': return 'from-emerald-500 to-green-500';
+            case 'completed': return 'from-blue-500 to-cyan-500';
+            case 'archived': return 'from-gray-500 to-gray-400';
+            default: return 'from-gray-500 to-gray-400';
         }
     };
 
-    const getStatusBadge = (status) => {
+    const getPriorityBadge = (priority) => {
         const colors = {
-            active: isDarkMode
-                ? 'bg-green-900/40 text-green-400 border-green-800/40'
-                : 'bg-green-50 text-green-700 border-green-200',
-            completed: isDarkMode
-                ? 'bg-blue-900/40 text-blue-400 border-blue-800/40'
-                : 'bg-blue-50 text-blue-700 border-blue-200',
-            archived: isDarkMode
-                ? 'bg-gray-800 text-gray-400 border-gray-700'
-                : 'bg-gray-100 text-gray-600 border-gray-200',
+            high: isDarkMode ? 'bg-rose-900/40 text-rose-400 border-rose-800/40' : 'bg-rose-50 text-rose-700 border-rose-200',
+            medium: isDarkMode ? 'bg-amber-900/40 text-amber-400 border-amber-800/40' : 'bg-amber-50 text-amber-700 border-amber-200',
+            low: isDarkMode ? 'bg-emerald-900/40 text-emerald-400 border-emerald-800/40' : 'bg-emerald-50 text-emerald-700 border-emerald-200',
         };
-        return colors[status] || colors.archived;
+        return colors[priority] || colors.medium;
+    };
+
+    const containerVariants = {
+        hidden: { opacity: 0 },
+        visible: {
+            opacity: 1,
+            transition: {
+                staggerChildren: 0.1
+            }
+        }
+    };
+
+    const itemVariants = {
+        hidden: { y: 20, opacity: 0 },
+        visible: {
+            y: 0,
+            opacity: 1,
+            transition: {
+                type: "spring",
+                stiffness: 100,
+                damping: 12
+            }
+        }
+    };
+
+    const handleDeleteSession = (e, sessionId) => {
+        e.stopPropagation();
+        // Add delete logic here
+        console.log('Delete session:', sessionId);
     };
 
     return (
-        <div className={`h-full flex flex-col ${isDarkMode ? 'bg-gray-950 text-white' : 'bg-gray-50 text-gray-900'}`}>
+        <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className={`h-full flex flex-col ${isDarkMode
+                ? 'bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 text-white'
+                : 'bg-gradient-to-br from-gray-50 via-white to-gray-50 text-gray-900'
+                }`}
+        >
+            {/* Animated Background Elements */}
+            <div className="fixed inset-0 overflow-hidden pointer-events-none">
+                <motion.div
+                    animate={{
+                        scale: [1, 1.2, 1],
+                        rotate: [0, 90, 0],
+                        opacity: [0.1, 0.15, 0.1]
+                    }}
+                    transition={{
+                        duration: 20,
+                        repeat: Infinity,
+                        ease: "linear"
+                    }}
+                    className={`absolute -top-1/2 -right-1/2 w-full h-full rounded-full ${isDarkMode
+                        ? 'bg-gradient-to-br from-blue-500/5 to-purple-500/5'
+                        : 'bg-gradient-to-br from-blue-500/5 to-cyan-500/5'
+                        } blur-3xl`}
+                />
+                <motion.div
+                    animate={{
+                        scale: [1.2, 1, 1.2],
+                        rotate: [90, 0, 90],
+                        opacity: [0.1, 0.15, 0.1]
+                    }}
+                    transition={{
+                        duration: 25,
+                        repeat: Infinity,
+                        ease: "linear"
+                    }}
+                    className={`absolute -bottom-1/2 -left-1/2 w-full h-full rounded-full ${isDarkMode
+                        ? 'bg-gradient-to-tr from-purple-500/5 to-pink-500/5'
+                        : 'bg-gradient-to-tr from-cyan-500/5 to-blue-500/5'
+                        } blur-3xl`}
+                />
+            </div>
+
             {/* Header */}
-            <div className={`px-6 py-3 border-b ${isDarkMode ? 'border-gray-800 bg-gray-900/50' : 'border-gray-200 bg-white'}`}>
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                        <button
+            <motion.div
+                initial={{ y: -20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ duration: 0.5 }}
+                className={`relative px-4 sm:px-6 py-4 border-b backdrop-blur-sm ${isDarkMode
+                    ? 'border-gray-800 bg-gray-900/50'
+                    : 'border-gray-200 bg-white/50'
+                    }`}
+            >
+                <div className="flex items-center justify-between max-w-7xl mx-auto">
+                    <div className="flex items-center gap-2 sm:gap-4">
+                        <motion.button
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.95 }}
                             onClick={onBack}
-                            className={`p-2 rounded-lg transition-colors ${isDarkMode
-                                ? 'hover:bg-gray-800 text-gray-400'
-                                : 'hover:bg-gray-100 text-gray-600'
+                            className={`p-2 rounded-xl transition-all duration-200 ${isDarkMode
+                                ? 'hover:bg-gray-800 text-gray-400 hover:text-white'
+                                : 'hover:bg-gray-100 text-gray-600 hover:text-gray-900'
                                 }`}
-                            title="Back to Dashboard"
                         >
                             <FiArrowLeft className="w-5 h-5" />
-                        </button>
+                        </motion.button>
                         <div>
-                            <h1 className="text-2xl font-bold flex items-center gap-2">
-                                {/* <TbRobot className="w-7 h-7 text-blue-500" /> */}
+                            <motion.h1
+                                initial={{ x: -20, opacity: 0 }}
+                                animate={{ x: 0, opacity: 1 }}
+                                transition={{ delay: 0.2 }}
+                                className="text-xl sm:text-2xl font-bold flex items-center gap-2"
+                            >
+                                <motion.div
+                                    animate={{
+                                        rotate: [0, 10, -10, 0],
+                                        scale: [1, 1.1, 1]
+                                    }}
+                                    transition={{
+                                        duration: 2,
+                                        repeat: Infinity,
+                                        repeatDelay: 3
+                                    }}
+                                >
+                                    <MdOutlineSmartToy className={`w-6 h-6 sm:w-7 sm:h-7 ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`} />
+                                </motion.div>
                                 Chat Sessions
-                            </h1>
-                            <p className={`text-sm mt-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                            </motion.h1>
+                            <motion.p
+                                initial={{ x: -20, opacity: 0 }}
+                                animate={{ x: 0, opacity: 1 }}
+                                transition={{ delay: 0.3 }}
+                                className={`text-xs sm:text-sm mt-0.5 sm:mt-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}
+                            >
                                 Manage and review your conversation history
-                            </p>
+                            </motion.p>
                         </div>
                     </div>
-                    <button
+                    <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
                         onClick={onBack}
-                        className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-blue-600 to-cyan-500 text-white rounded-xl font-medium text-sm hover:shadow-lg hover:shadow-blue-500/25 transition-all duration-200 hover:scale-105">
-                        <FiPlus className="w-4 h-4" />
-                        New Chat
-                    </button>
+                        className="flex items-center gap-1 sm:gap-2 px-3 sm:px-5 py-2 sm:py-2.5 bg-gradient-to-r from-blue-600 to-cyan-500 text-white rounded-xl font-medium text-xs sm:text-sm hover:shadow-lg hover:shadow-blue-500/25 transition-all duration-200"
+                    >
+                        <FiPlus className="w-3 h-3 sm:w-4 sm:h-4" />
+                        <span className="hidden sm:inline">New Chat</span>
+                        <span className="sm:hidden">New</span>
+                    </motion.button>
                 </div>
-            </div>
+            </motion.div>
 
-            {/* Search and Filters - Below the header line */}
-            <div className={`px-6 py-4 ${isDarkMode ? 'bg-gray-900/30' : 'bg-white'}`}>
-                <div className="flex flex-col sm:flex-row gap-3">
-                    <div className="relative flex-1">
-                        <FiSearch className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`} />
-                        <input
-                            type="text"
-                            placeholder="Search sessions by title or machine..."
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            className={`w-full pl-10 pr-4 py-2.5 rounded-xl border text-sm transition-colors ${isDarkMode
-                                ? 'bg-gray-800 border-gray-700 text-white placeholder-gray-500 focus:border-blue-500'
-                                : 'bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400 focus:border-blue-500'
-                                } outline-none`}
-                        />
-                    </div>
-                    <div className="flex gap-2">
-                        {filters.map((filter) => (
-                            <button
-                                key={filter.key}
-                                onClick={() => setActiveFilter(filter.key)}
-                                className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${activeFilter === filter.key
-                                    ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
-                                    : isDarkMode
-                                        ? 'bg-gray-800 text-gray-400 hover:bg-gray-700'
-                                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                                    }`}
-                            >
-                                {filter.label}
-                            </button>
-                        ))}
-                    </div>
-                </div>
-            </div>
-
-            {/* Sessions List */}
-            <div className="flex-1 overflow-y-auto p-6">
-                <div className="space-y-3 max-w-screen-2xl mx-auto">
-                    {filteredSessions.length === 0 ? (
-                        <div className="text-center py-16">
-                            <FiMessageSquare className={`w-16 h-16 mx-auto mb-4 ${isDarkMode ? 'text-gray-700' : 'text-gray-300'}`} />
-                            <h3 className={`text-lg font-semibold mb-2 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                                No sessions found
-                            </h3>
-                            <p className={`text-sm ${isDarkMode ? 'text-gray-600' : 'text-gray-400'}`}>
-                                Try adjusting your search or filter criteria
-                            </p>
+            {/* Search and Filters */}
+            <motion.div
+                initial={{ y: -20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.4 }}
+                className={`relative px-4 sm:px-6 py-4 backdrop-blur-sm ${isDarkMode ? 'bg-gray-900/30' : 'bg-white/30'
+                    }`}
+            >
+                <div className="max-w-7xl mx-auto">
+                    {/* Mobile Filter Toggle */}
+                    <div className="sm:hidden flex gap-2 mb-3">
+                        <div className="relative flex-1">
+                            <FiSearch className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`} />
+                            <input
+                                type="text"
+                                placeholder="Search..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                className={`w-full pl-10 pr-4 py-2.5 rounded-xl border text-sm transition-all duration-200 ${isDarkMode
+                                    ? 'bg-gray-800/80 border-gray-700 text-white placeholder-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20'
+                                    : 'bg-white/80 border-gray-200 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20'
+                                    } outline-none`}
+                            />
                         </div>
-                    ) : (
-                        filteredSessions.map((session) => (
-                            <div
-                                key={session.id}
-                                className={`p-4 rounded-xl border transition-all duration-200 cursor-pointer group hover:scale-[1.01] ${isDarkMode
-                                    ? 'bg-gray-900 border-gray-800 hover:border-gray-700 hover:bg-gray-800/80'
-                                    : 'bg-white border-gray-200 hover:border-gray-300 hover:shadow-md'
-                                    }`}
+                        <motion.button
+                            whileTap={{ scale: 0.95 }}
+                            onClick={() => setShowMobileFilters(!showMobileFilters)}
+                            className={`p-3 rounded-xl ${activeFilter !== 'all'
+                                    ? 'bg-blue-600 text-white'
+                                    : isDarkMode
+                                        ? 'bg-gray-800 text-gray-400'
+                                        : 'bg-gray-100 text-gray-600'
+                                }`}
+                        >
+                            <FiFilter className="w-4 h-4" />
+                        </motion.button>
+                    </div>
+
+                    {/* Filters - Desktop */}
+                    <div className="hidden sm:flex flex-col sm:flex-row gap-3">
+                        <div className="relative flex-1">
+                            <FiSearch className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`} />
+                            <input
+                                type="text"
+                                placeholder="Search sessions by title, machine, or content..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                className={`w-full pl-10 pr-4 py-3 rounded-xl border text-sm transition-all duration-200 ${isDarkMode
+                                    ? 'bg-gray-800/80 border-gray-700 text-white placeholder-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20'
+                                    : 'bg-white/80 border-gray-200 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20'
+                                    } outline-none`}
+                            />
+                        </div>
+                        <div className="flex gap-2">
+                            {filters.map((filter) => {
+                                const Icon = filter.icon;
+                                return (
+                                    <motion.button
+                                        key={filter.key}
+                                        whileHover={{ scale: 1.05 }}
+                                        whileTap={{ scale: 0.95 }}
+                                        onClick={() => setActiveFilter(filter.key)}
+                                        className={`px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 flex items-center gap-2 ${activeFilter === filter.key
+                                            ? 'bg-gradient-to-r from-blue-600 to-cyan-500 text-white shadow-lg shadow-blue-500/30'
+                                            : isDarkMode
+                                                ? 'bg-gray-800/80 text-gray-400 hover:bg-gray-700'
+                                                : 'bg-white/80 text-gray-600 hover:bg-gray-100'
+                                            }`}
+                                    >
+                                        <Icon className="w-4 h-4" />
+                                        {filter.label}
+                                    </motion.button>
+                                );
+                            })}
+                        </div>
+                    </div>
+
+                    {/* Mobile Filters Dropdown */}
+                    <AnimatePresence>
+                        {showMobileFilters && (
+                            <motion.div
+                                initial={{ height: 0, opacity: 0 }}
+                                animate={{ height: 'auto', opacity: 1 }}
+                                exit={{ height: 0, opacity: 0 }}
+                                transition={{ duration: 0.3 }}
+                                className="sm:hidden overflow-hidden"
                             >
-                                <div className="flex items-start justify-between">
-                                    <div className="flex-1 min-w-0">
-                                        <div className="flex items-center gap-3 mb-2">
-                                            <div className={`w-2 h-2 rounded-full ${getStatusColor(session.status)}`}></div>
-                                            <h3 className="font-semibold text-sm truncate">{session.title}</h3>
-                                            <span className={`px-2 py-0.5 rounded-full text-xs font-medium border ${getStatusBadge(session.status)}`}>
-                                                {session.status}
-                                            </span>
-                                        </div>
-                                        <p className={`text-sm mb-3 pl-5 truncate ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                                            {session.lastMessage}
-                                        </p>
-                                        <div className={`flex items-center gap-4 pl-5 text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>
-                                            <span className="flex items-center gap-1">
-                                                <FiClock className="w-3 h-3" />
-                                                {session.date} at {session.time}
-                                            </span>
-                                            <span className="flex items-center gap-1">
-                                                <FiMessageSquare className="w-3 h-3" />
-                                                {session.messages} messages
-                                            </span>
-                                            <span className={`px-2 py-0.5 rounded-md text-xs ${isDarkMode ? 'bg-gray-800 text-gray-400' : 'bg-gray-100 text-gray-600'
-                                                }`}>
-                                                {session.machine}
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <div className="flex items-center gap-2 ml-4">
-                                        <button className={`p-2 rounded-lg opacity-0 group-hover:opacity-100 transition-all ${isDarkMode
-                                            ? 'hover:bg-gray-700 text-gray-500'
-                                            : 'hover:bg-gray-100 text-gray-400'
-                                            }`}>
-                                            <FiTrash2 className="w-4 h-4" />
-                                        </button>
-                                        <FiChevronRight className={`w-5 h-5 transition-transform group-hover:translate-x-1 ${isDarkMode ? 'text-gray-600' : 'text-gray-300'
-                                            }`} />
+                                <div className={`mt-3 p-2 rounded-xl ${isDarkMode ? 'bg-gray-800' : 'bg-white'} border ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
+                                    <div className="flex flex-col gap-1">
+                                        {filters.map((filter) => {
+                                            const Icon = filter.icon;
+                                            return (
+                                                <motion.button
+                                                    key={filter.key}
+                                                    whileTap={{ scale: 0.98 }}
+                                                    onClick={() => {
+                                                        setActiveFilter(filter.key);
+                                                        setShowMobileFilters(false);
+                                                    }}
+                                                    className={`px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-3 ${activeFilter === filter.key
+                                                        ? 'bg-gradient-to-r from-blue-600 to-cyan-500 text-white'
+                                                        : isDarkMode
+                                                            ? 'text-gray-400 hover:bg-gray-700'
+                                                            : 'text-gray-600 hover:bg-gray-100'
+                                                        }`}
+                                                >
+                                                    <Icon className="w-4 h-4" />
+                                                    {filter.label}
+                                                </motion.button>
+                                            );
+                                        })}
                                     </div>
                                 </div>
-                            </div>
-                        ))
-                    )}
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
                 </div>
+            </motion.div>
 
-                {/* Summary Footer */}
-                <div className={`max-w-4xl mx-auto mt-6 pt-4 border-t text-center ${isDarkMode ? 'border-gray-800' : 'border-gray-200'}`}>
-                    <p className={`text-sm ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>
-                        Showing {filteredSessions.length} of {sessions.length} sessions
-                    </p>
-                </div>
+            {/* Sessions List */}
+            <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-4 sm:py-6">
+                <motion.div
+                    variants={containerVariants}
+                    initial="hidden"
+                    animate={isLoaded ? "visible" : "hidden"}
+                    className="space-y-3 max-w-7xl mx-auto"
+                >
+                    <AnimatePresence mode="popLayout">
+                        {filteredSessions.length === 0 ? (
+                            <motion.div
+                                initial={{ scale: 0.9, opacity: 0 }}
+                                animate={{ scale: 1, opacity: 1 }}
+                                exit={{ scale: 0.9, opacity: 0 }}
+                                className="text-center py-16 px-4"
+                            >
+                                <motion.div
+                                    animate={{
+                                        y: [0, -10, 0],
+                                        rotate: [0, 5, -5, 0]
+                                    }}
+                                    transition={{
+                                        duration: 4,
+                                        repeat: Infinity,
+                                        ease: "easeInOut"
+                                    }}
+                                >
+                                    <BsChatDots className={`w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-4 ${isDarkMode ? 'text-gray-700' : 'text-gray-300'}`} />
+                                </motion.div>
+                                <h3 className={`text-lg sm:text-xl font-semibold mb-2 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                    No sessions found
+                                </h3>
+                                <p className={`text-sm sm:text-base ${isDarkMode ? 'text-gray-600' : 'text-gray-400'}`}>
+                                    Try adjusting your search or filter criteria
+                                </p>
+                            </motion.div>
+                        ) : (
+                            filteredSessions.map((session, index) => (
+                                <motion.div
+                                    key={session.id}
+                                    layout
+                                    variants={itemVariants}
+                                    initial="hidden"
+                                    animate="visible"
+                                    exit={{ opacity: 0, scale: 0.9, y: -20 }}
+                                    whileHover={{ scale: 1.01, y: -2 }}
+                                    whileTap={{ scale: 0.99 }}
+                                    onClick={() => setSelectedSession(session.id === selectedSession ? null : session.id)}
+                                    className={`p-4 sm:p-5 rounded-xl border transition-all duration-300 cursor-pointer group relative overflow-hidden ${selectedSession === session.id
+                                            ? isDarkMode
+                                                ? 'border-blue-500/50 bg-gradient-to-br from-gray-800 to-gray-900'
+                                                : 'border-blue-500/50 bg-gradient-to-br from-white to-blue-50/50'
+                                            : isDarkMode
+                                                ? 'bg-gray-900/50 border-gray-800 hover:border-gray-700 hover:bg-gray-800/50'
+                                                : 'bg-white/50 border-gray-200 hover:border-gray-300 hover:shadow-lg hover:bg-white'
+                                        }`}
+                                >
+                                    {/* Animated Gradient Background on Hover */}
+                                    <motion.div
+                                        className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                                        style={{
+                                            background: `radial-gradient(circle at ${index * 20}% ${index * 30}%, ${isDarkMode ? 'rgba(59, 130, 246, 0.1)' : 'rgba(59, 130, 246, 0.05)'} 0%, transparent 50%)`
+                                        }}
+                                    />
+
+                                    <div className="flex items-start justify-between relative z-10">
+                                        <div className="flex-1 min-w-0">
+                                            <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-2">
+                                                <div className="flex items-center gap-2">
+                                                    <motion.div
+                                                        animate={{
+                                                            scale: [1, 1.2, 1],
+                                                            opacity: [0.5, 1, 0.5]
+                                                        }}
+                                                        transition={{
+                                                            duration: 2,
+                                                            repeat: session.status === 'active' ? Infinity : 0,
+                                                            repeatDelay: 1
+                                                        }}
+                                                        className={`w-2 h-2 rounded-full bg-gradient-to-r ${getStatusColor(session.status)}`}
+                                                    />
+                                                    <h3 className="font-semibold text-sm sm:text-base truncate max-w-[150px] sm:max-w-xs">
+                                                        {session.title}
+                                                    </h3>
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium border capitalize ${getPriorityBadge(session.priority)}`}>
+                                                        {session.priority}
+                                                    </span>
+                                                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium border ${isDarkMode
+                                                            ? session.status === 'active'
+                                                                ? 'bg-green-900/40 text-green-400 border-green-800/40'
+                                                                : session.status === 'completed'
+                                                                    ? 'bg-blue-900/40 text-blue-400 border-blue-800/40'
+                                                                    : 'bg-gray-800 text-gray-400 border-gray-700'
+                                                            : session.status === 'active'
+                                                                ? 'bg-green-50 text-green-700 border-green-200'
+                                                                : session.status === 'completed'
+                                                                    ? 'bg-blue-50 text-blue-700 border-blue-200'
+                                                                    : 'bg-gray-100 text-gray-600 border-gray-200'
+                                                        }`}>
+                                                        {session.status}
+                                                    </span>
+                                                </div>
+                                            </div>
+
+                                            <p className={`text-xs sm:text-sm mb-3 pl-4 line-clamp-2 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                                {session.lastMessage}
+                                            </p>
+
+                                            <div className="flex flex-wrap items-center gap-3 sm:gap-6 pl-4">
+                                                <motion.span
+                                                    whileHover={{ scale: 1.05 }}
+                                                    className={`flex items-center gap-1.5 text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}
+                                                >
+                                                    <FiCalendar className="w-3 h-3" />
+                                                    <span className="hidden sm:inline">{session.date} at {session.time}</span>
+                                                    <span className="sm:hidden">{session.date}</span>
+                                                </motion.span>
+
+                                                <motion.span
+                                                    whileHover={{ scale: 1.05 }}
+                                                    className={`flex items-center gap-1.5 text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}
+                                                >
+                                                    <FiMessageCircle className="w-3 h-3" />
+                                                    {session.messages}
+                                                </motion.span>
+
+                                                <motion.span
+                                                    whileHover={{ scale: 1.05 }}
+                                                    className={`flex items-center gap-1.5 text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}
+                                                >
+                                                    <FiCpu className="w-3 h-3" />
+                                                    <span className="hidden sm:inline">{session.machine}</span>
+                                                    <span className="sm:hidden truncate max-w-[80px]">{session.machine}</span>
+                                                </motion.span>
+
+                                                {session.participants && (
+                                                    <motion.span
+                                                        whileHover={{ scale: 1.05 }}
+                                                        className={`hidden sm:flex items-center gap-1.5 text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}
+                                                    >
+                                                        <TbDeviceAnalytics className="w-3 h-3" />
+                                                        {session.participants} participants
+                                                    </motion.span>
+                                                )}
+                                            </div>
+
+                                            {/* Mobile-only additional info */}
+                                            <div className="sm:hidden flex items-center gap-3 mt-2 pl-4">
+                                                <span className={`text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>
+                                                    <FiClock className="w-3 h-3 inline mr-1" />
+                                                    {session.lastActive}
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        <div className="flex items-center gap-1 sm:gap-2 ml-2 sm:ml-4">
+                                            <motion.button
+                                                whileHover={{ scale: 1.1 }}
+                                                whileTap={{ scale: 0.9 }}
+                                                onClick={(e) => handleDeleteSession(e, session.id)}
+                                                className={`p-1.5 sm:p-2 rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-200 ${isDarkMode
+                                                    ? 'hover:bg-red-500/10 text-gray-500 hover:text-red-400'
+                                                    : 'hover:bg-red-50 text-gray-400 hover:text-red-500'
+                                                    }`}
+                                            >
+                                                <FiTrash2 className="w-3 h-3 sm:w-4 sm:h-4" />
+                                            </motion.button>
+                                            <motion.div
+                                                animate={{ x: selectedSession === session.id ? 5 : 0 }}
+                                                transition={{ type: "spring", stiffness: 300 }}
+                                            >
+                                                <FiChevronRight className={`w-4 h-4 sm:w-5 sm:h-5 transition-colors ${selectedSession === session.id
+                                                        ? 'text-blue-500'
+                                                        : isDarkMode
+                                                            ? 'text-gray-600'
+                                                            : 'text-gray-300'
+                                                    }`} />
+                                            </motion.div>
+                                        </div>
+                                    </div>
+
+                                    {/* Expanded Content */}
+                                    <AnimatePresence>
+                                        {selectedSession === session.id && (
+                                            <motion.div
+                                                initial={{ height: 0, opacity: 0 }}
+                                                animate={{ height: 'auto', opacity: 1 }}
+                                                exit={{ height: 0, opacity: 0 }}
+                                                transition={{ duration: 0.3 }}
+                                                className="overflow-hidden"
+                                            >
+                                                <div className={`mt-4 pt-4 border-t ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
+                                                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                                                        <div className={`p-2 rounded-lg ${isDarkMode ? 'bg-gray-800' : 'bg-gray-50'}`}>
+                                                            <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Total Messages</p>
+                                                            <p className="text-sm font-semibold mt-1">{session.messages}</p>
+                                                        </div>
+                                                        <div className={`p-2 rounded-lg ${isDarkMode ? 'bg-gray-800' : 'bg-gray-50'}`}>
+                                                            <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Participants</p>
+                                                            <p className="text-sm font-semibold mt-1">{session.participants}</p>
+                                                        </div>
+                                                        <div className={`p-2 rounded-lg ${isDarkMode ? 'bg-gray-800' : 'bg-gray-50'}`}>
+                                                            <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Last Active</p>
+                                                            <p className="text-sm font-semibold mt-1">{session.lastActive}</p>
+                                                        </div>
+                                                        <div className={`p-2 rounded-lg ${isDarkMode ? 'bg-gray-800' : 'bg-gray-50'}`}>
+                                                            <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Machine</p>
+                                                            <p className="text-sm font-semibold mt-1 truncate">{session.machine}</p>
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex justify-end mt-3">
+                                                        <motion.button
+                                                            whileHover={{ scale: 1.05 }}
+                                                            whileTap={{ scale: 0.95 }}
+                                                            className="text-xs text-blue-500 hover:text-blue-600 font-medium flex items-center gap-1"
+                                                        >
+                                                            View Full Conversation
+                                                            <FiChevronRight className="w-3 h-3" />
+                                                        </motion.button>
+                                                    </div>
+                                                </div>
+                                            </motion.div>
+                                        )}
+                                    </AnimatePresence>
+                                </motion.div>
+                            ))
+                        )}
+                    </AnimatePresence>
+
+                    {/* Summary Footer */}
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.8 }}
+                        className={`max-w-7xl mx-auto mt-6 pt-4 border-t text-center ${isDarkMode ? 'border-gray-800' : 'border-gray-200'
+                            }`}
+                    >
+                        <p className={`text-xs sm:text-sm ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>
+                            Showing <span className="font-semibold text-blue-500">{filteredSessions.length}</span> of {sessions.length} sessions
+                        </p>
+                        <p className={`text-xs mt-1 ${isDarkMode ? 'text-gray-600' : 'text-gray-400'}`}>
+                            Last updated just now
+                        </p>
+                    </motion.div>
+                </motion.div>
             </div>
-        </div>
+        </motion.div>
     );
 };
 
