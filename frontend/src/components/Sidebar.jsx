@@ -31,9 +31,9 @@ const Sidebar = ({ isOpen, toggleSidebar, isDarkMode, activePage, onNavigate, to
     const menuItems = [
         { icon: <FiHome />, label: 'Dashboard', page: 'dashboard' },
         { icon: <FiMessageSquare />, label: 'Chat Sessions', page: 'chatSessions' },
-        { icon: <FiFileText />, label: 'Documentation' },
+        { icon: <FiFileText />, label: 'Documentation', page: 'documentation' },
         { icon: <FiSettings />, label: 'Machine Settings', page: 'machineSettings' },
-        { icon: <TbDatabase />, label: 'Knowledge Base' },
+        { icon: <TbDatabase />, label: 'Knowledge Base', page: 'knowledgeBase' },
         { icon: <FiBarChart2 />, label: 'Analytics' },
         { icon: <FiUsers />, label: 'Team Members' },
         { icon: <FiFolder />, label: 'Projects' },

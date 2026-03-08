@@ -13,6 +13,7 @@ import {
     FiDownload,
     FiCopy,
     FiVolume2,
+    FiMenu,
 } from 'react-icons/fi';
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -33,6 +34,7 @@ const ChatUI = ({
     sendMessage,
     loading,
     isSidebarOpen,
+    toggleSidebar,
     selectedMachine,
     setSelectedMachine,
     isDarkMode,
@@ -109,6 +111,47 @@ const ChatUI = ({
     const [inputFocused, setInputFocused] = useState(false);
     const [selectedQuickQuestion, setSelectedQuickQuestion] = useState(null);
     const [scanActive, setScanActive] = useState(true);
+    const [machineDropdownOpen, setMachineDropdownOpen] = useState(false);
+    const dropdownRef = useRef(null);
+
+    // Close dropdown on outside click
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+                setMachineDropdownOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
+    const machines = [
+        { id: 'CNC Router', name: 'CNC Router', status: 'online' },
+        { id: 'Laser Cutter', name: 'Laser Cutter', status: 'online' },
+        { id: '3D Printer', name: '3D Printer', status: 'maintenance' },
+        { id: 'CNC Mill', name: 'CNC Mill', status: 'online' },
+        { id: 'Lathe', name: 'Lathe', status: 'offline' },
+    ];
+
+    const getStatusColor = (status) => {
+        switch (status) {
+            case 'online': return 'bg-green-500';
+            case 'maintenance': return 'bg-amber-500';
+            case 'offline': return 'bg-red-500';
+            default: return 'bg-gray-400';
+        }
+    };
+
+    const getStatusLabel = (status) => {
+        switch (status) {
+            case 'online': return 'Online';
+            case 'maintenance': return 'Maintenance';
+            case 'offline': return 'Offline';
+            default: return 'Unknown';
+        }
+    };
+
+    const selectedMachineData = machines.find(m => m.id === selectedMachine);
 
     // Auto-scroll to bottom of messages
     useEffect(() => {
@@ -145,24 +188,34 @@ const ChatUI = ({
             : "bg-gray-50 text-gray-900"
             }`}>
             {/* Top Navigation Bar */}
-            <div className={`sticky top-0 z-50 flex items-center justify-between px-6 py-4 border-b ${isDarkMode
+            <div className={`sticky top-0 z-50 flex items-center justify-between px-3 sm:px-6 py-3 sm:py-4 border-b ${isDarkMode
                 ? "bg-gray-900/80 backdrop-blur-sm border-gray-700"
                 : "bg-white/90 backdrop-blur-sm border-gray-200"
                 }`}>
                 {/* Left side - Branding with Hamburger */}
-                <div className="flex items-center gap-3">
-                    <div className={`p-2 rounded-xl ${isDarkMode
+                <div className="flex items-center gap-2 sm:gap-3">
+                    {/* Mobile Hamburger */}
+                    <button
+                        onClick={toggleSidebar}
+                        className={`lg:hidden p-2 rounded-xl transition-colors ${isDarkMode
+                            ? 'hover:bg-gray-800 text-gray-400'
+                            : 'hover:bg-gray-100 text-gray-600'
+                            }`}
+                    >
+                        <FiMenu className="w-5 h-5" />
+                    </button>
+                    <div className={`p-1.5 sm:p-2 rounded-xl ${isDarkMode
                         ? "bg-gradient-to-br from-blue-800/30 to-cyan-800/30 border border-gray-800"
                         : "bg-gradient-to-br from-blue-100 to-cyan-100 border border-blue-200"
                         }`}>
                         <img
                             src={ib}
                             alt="Logo"
-                            className="w-7 h-7 object-contain scale-125"
+                            className="w-6 h-6 sm:w-7 sm:h-7 object-contain scale-125"
                         />
                     </div>
-                    <div>
-                        <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">
+                    <div className="hidden sm:block">
+                        <h1 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">
                             IndusBot
                         </h1>
                         <p className={`text-xs ${isDarkMode ? "text-gray-400" : "text-gray-500"}`}>
@@ -173,45 +226,151 @@ const ChatUI = ({
 
                 {/* Right side - Controls */}
                 <div className="flex items-center gap-4">
-                    {/* Machine Status Indicator */}
-                    <div className={`flex items-center gap-2 px-3 py-2 rounded-lg ${isDarkMode
-                        ? selectedMachine ? "bg-green-900/30 border border-green-800/30" : "bg-gray-800 border border-gray-700"
-                        : selectedMachine ? "bg-green-50 border border-green-200" : "bg-gray-100 border border-gray-200"
-                        }`}>
-                        <div className={`w-2 h-2 rounded-full ${selectedMachine ? "bg-green-500 animate-pulse" : "bg-gray-400"
-                            }`}></div>
-                        <select
-                            className={`text-sm rounded-lg px-2 py-1 focus:outline-none
-    ${isDarkMode
-                                    ? "bg-gray-800 text-gray-200 border border-gray-700"
-                                    : "bg-white text-gray-700 border border-gray-300"
+                    {/* Custom Machine Dropdown */}
+                    <div className="relative" ref={dropdownRef}>
+                        {/* Dropdown Trigger Button */}
+                        <button
+                            onClick={() => setMachineDropdownOpen(!machineDropdownOpen)}
+                            className={`flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl transition-all duration-200 min-w-[160px] sm:min-w-[290px] ${machineDropdownOpen
+                                ? isDarkMode
+                                    ? 'bg-gray-800 border-2 border-blue-500/50 ring-2 ring-blue-500/20'
+                                    : 'bg-white border-2 border-blue-500/50 ring-2 ring-blue-500/20 shadow-lg'
+                                : isDarkMode
+                                    ? selectedMachine
+                                        ? 'bg-gray-800 border border-gray-700 hover:border-gray-600'
+                                        : 'bg-gray-800 border border-gray-700 hover:border-gray-600'
+                                    : selectedMachine
+                                        ? 'bg-white border border-gray-200 hover:border-gray-300 shadow-sm'
+                                        : 'bg-white border border-gray-200 hover:border-gray-300 shadow-sm'
                                 }`}
-                            value={selectedMachine}
-                            onChange={(e) => setSelectedMachine(e.target.value)}
                         >
-                            <option
-                                value=""
-                                className={isDarkMode ? "bg-gray-800 text-gray-400" : "bg-white text-gray-500"}
-                            >
-                                Select Machine
-                            </option>
+                            {/* Status Dot */}
+                            <div className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${selectedMachineData
+                                ? `${getStatusColor(selectedMachineData.status)} ${selectedMachineData.status === 'online' ? 'animate-pulse' : ''}`
+                                : 'bg-gray-400'
+                                }`} />
 
-                            <option className={isDarkMode ? "bg-gray-800 text-gray-200" : "bg-white text-gray-700"}>
-                                Machine A - CNC Router
-                            </option>
-                            <option className={isDarkMode ? "bg-gray-800 text-gray-200" : "bg-white text-gray-700"}>
-                                Machine B - Laser Cutter
-                            </option>
-                            <option className={isDarkMode ? "bg-gray-800 text-gray-200" : "bg-white text-gray-700"}>
-                                Machine C - 3D Printer
-                            </option>
-                            <option className={isDarkMode ? "bg-gray-800 text-gray-200" : "bg-white text-gray-700"}>
-                                Machine D - CNC Mill
-                            </option>
-                            <option className={isDarkMode ? "bg-gray-800 text-gray-200" : "bg-white text-gray-700"}>
-                                Machine E - Lathe
-                            </option>
-                        </select>
+                            {/* Selected Machine Text */}
+                            <div className="flex-1 text-left">
+                                <p className={`text-sm font-medium ${selectedMachineData
+                                    ? isDarkMode ? 'text-gray-200' : 'text-gray-800'
+                                    : isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                                    }`}>
+                                    {selectedMachineData ? selectedMachineData.name : 'Select Machine'}
+                                </p>
+                            </div>
+
+                            {/* Chevron */}
+                            <motion.div
+                                animate={{ rotate: machineDropdownOpen ? 180 : 0 }}
+                                transition={{ duration: 0.2 }}
+                            >
+                                <FiChevronDown className={`w-4 h-4 flex-shrink-0 ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`} />
+                            </motion.div>
+                        </button>
+
+                        {/* Dropdown Panel */}
+                        <AnimatePresence>
+                            {machineDropdownOpen && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: -8, scale: 0.96 }}
+                                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                                    exit={{ opacity: 0, y: -8, scale: 0.96 }}
+                                    transition={{ duration: 0.15, ease: 'easeOut' }}
+                                    className={`absolute right-0 top-full mt-2 w-72 rounded-xl overflow-hidden z-[100] ${isDarkMode
+                                        ? 'bg-gray-800 border border-gray-700 shadow-2xl shadow-black/50'
+                                        : 'bg-white border border-gray-200 shadow-2xl shadow-gray-300/50'
+                                        }`}
+                                >
+                                    {/* Dropdown Header */}
+                                    <div className={`px-4 py-3 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-100'}`}>
+                                        <p className={`text-xs font-semibold uppercase tracking-wider ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>
+                                            Available Machines
+                                        </p>
+                                    </div>
+
+                                    {/* Machine Options */}
+                                    <div className="py-1.5 max-h-[280px] overflow-y-auto">
+                                        {machines.map((machine, index) => (
+                                            <motion.button
+                                                key={machine.id}
+                                                initial={{ opacity: 0, x: -10 }}
+                                                animate={{ opacity: 1, x: 0 }}
+                                                transition={{ delay: index * 0.04 }}
+                                                onClick={() => {
+                                                    setSelectedMachine(machine.id);
+                                                    setMachineDropdownOpen(false);
+                                                }}
+                                                className={`w-full flex items-center gap-3 px-4 py-3 transition-all duration-150 ${selectedMachine === machine.id
+                                                    ? isDarkMode
+                                                        ? 'bg-blue-900/30 border-l-2 border-blue-500'
+                                                        : 'bg-blue-50 border-l-2 border-blue-500'
+                                                    : isDarkMode
+                                                        ? 'hover:bg-gray-700/50 border-l-2 border-transparent'
+                                                        : 'hover:bg-gray-50 border-l-2 border-transparent'
+                                                    }`}
+                                            >
+                                                {/* Machine Icon */}
+                                                <div className={`p-2 rounded-lg flex-shrink-0 ${selectedMachine === machine.id
+                                                    ? isDarkMode
+                                                        ? 'bg-blue-900/40 text-blue-400'
+                                                        : 'bg-blue-100 text-blue-600'
+                                                    : isDarkMode
+                                                        ? 'bg-gray-700 text-gray-400'
+                                                        : 'bg-gray-100 text-gray-500'
+                                                    }`}>
+                                                    <FiCpu className="w-4 h-4" />
+                                                </div>
+
+                                                {/* Machine Info */}
+                                                <div className="flex-1 text-left">
+                                                    <p className={`text-sm font-medium ${selectedMachine === machine.id
+                                                        ? isDarkMode ? 'text-blue-400' : 'text-blue-700'
+                                                        : isDarkMode ? 'text-gray-200' : 'text-gray-800'
+                                                        }`}>
+                                                        {machine.name}
+                                                    </p>
+                                                </div>
+
+                                                {/* Status Badge */}
+                                                <div className={`flex items-center gap-1.5 px-2 py-1 rounded-full text-xs ${machine.status === 'online'
+                                                    ? isDarkMode ? 'bg-green-900/30 text-green-400' : 'bg-green-50 text-green-600'
+                                                    : machine.status === 'maintenance'
+                                                        ? isDarkMode ? 'bg-amber-900/30 text-amber-400' : 'bg-amber-50 text-amber-600'
+                                                        : isDarkMode ? 'bg-red-900/30 text-red-400' : 'bg-red-50 text-red-600'
+                                                    }`}>
+                                                    <div className={`w-1.5 h-1.5 rounded-full ${getStatusColor(machine.status)} ${machine.status === 'online' ? 'animate-pulse' : ''}`} />
+                                                    <span className="font-medium">{getStatusLabel(machine.status)}</span>
+                                                </div>
+
+                                                {/* Selected Check */}
+                                                {selectedMachine === machine.id && (
+                                                    <FiCheckCircle className={`w-4 h-4 flex-shrink-0 ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`} />
+                                                )}
+                                            </motion.button>
+                                        ))}
+                                    </div>
+
+                                    {/* Dropdown Footer */}
+                                    {selectedMachine && (
+                                        <div className={`px-4 py-2.5 border-t ${isDarkMode ? 'border-gray-700' : 'border-gray-100'}`}>
+                                            <button
+                                                onClick={() => {
+                                                    setSelectedMachine('');
+                                                    setMachineDropdownOpen(false);
+                                                }}
+                                                className={`w-full text-xs text-center py-1.5 rounded-lg transition-colors ${isDarkMode
+                                                    ? 'text-gray-500 hover:text-gray-300 hover:bg-gray-700'
+                                                    : 'text-gray-400 hover:text-gray-600 hover:bg-gray-50'
+                                                    }`}
+                                            >
+                                                Clear Selection
+                                            </button>
+                                        </div>
+                                    )}
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
                     </div>
                 </div>
             </div>
@@ -264,28 +423,28 @@ const ChatUI = ({
                         {/* Hero Section (Existing content untouched) */}
                         <div className="text-center max-w-2xl mx-auto relative z-10">
                             {/* Animated Icon */}
-                            <div className={`relative mb-4 inline-block p-6 rounded-2xl ${isDarkMode
+                            <div className={`relative mb-4 inline-block p-3 sm:p-6 rounded-2xl ${isDarkMode
                                 ? "bg-gradient-to-br from-gray-800 to-gray-900 border border-gray-700"
                                 : "bg-white border border-gray-200 shadow-lg"
                                 }`}>
                                 <div className={`absolute inset-0 rounded-2xl bg-gradient-to-r from-blue-500/10 to-cyan-500/10 animate-pulse`}></div>
-                                <div className={`p-7 rounded-xl ${isDarkMode
+                                <div className={`p-4 sm:p-7 rounded-xl ${isDarkMode
                                     ? "bg-gradient-to-br from-blue-900/30 to-cyan-900/30"
                                     : "bg-gradient-to-br from-blue-50 to-cyan-50"
                                     }`}>
                                     <img
                                         src={ib}
                                         alt="Machine"
-                                        className="w-44 h-44 mx-auto object-contain scale-125"
+                                        className="w-24 h-24 sm:w-44 sm:h-44 mx-auto object-contain scale-125"
                                     />
                                 </div>
                             </div>
 
                             {/* Welcome Text */}
-                            <h1 className={`text-4xl font-bold mb-4 ${isDarkMode ? "text-gray-100" : "text-gray-900"}`}>
+                            <h1 className={`text-2xl sm:text-4xl font-bold mb-3 sm:mb-4 ${isDarkMode ? "text-gray-100" : "text-gray-900"}`}>
                                 Welcome to <span className="bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">IndusBot AI</span>
                             </h1>
-                            <p className={`text-lg mb-4 ${isDarkMode ? "text-gray-400" : "text-gray-600"}`}>
+                            <p className={`text-sm sm:text-lg mb-3 sm:mb-4 ${isDarkMode ? "text-gray-400" : "text-gray-600"}`}>
                                 Your intelligent assistant for industrial machine troubleshooting, maintenance guidance, and operational support.
                             </p>
 
@@ -326,12 +485,12 @@ const ChatUI = ({
                                         placeholder={selectedMachine
                                             ? "Describe your issue or ask a question..."
                                             : "Please select a machine first..."}
-                                        className={`flex-1 bg-transparent px-5 py-4 focus:outline-none disabled:opacity-50 ${isDarkMode ? "placeholder-gray-500" : "placeholder-gray-400"}`}
+                                        className={`flex-1 bg-transparent px-3 sm:px-5 py-3 sm:py-4 text-sm sm:text-base focus:outline-none disabled:opacity-50 ${isDarkMode ? "placeholder-gray-500" : "placeholder-gray-400"}`}
                                     />
                                     <button
                                         onClick={sendMessage}
                                         disabled={!selectedMachine || !question.trim()}
-                                        className={`flex items-center gap-2 px-6 py-4 rounded-xl font-medium transition-all duration-300 ${!selectedMachine || !question.trim()
+                                        className={`flex items-center gap-2 px-4 sm:px-6 py-3 sm:py-4 rounded-xl font-medium text-sm sm:text-base transition-all duration-300 ${!selectedMachine || !question.trim()
                                             ? (isDarkMode
                                                 ? "bg-gray-700 text-gray-500"
                                                 : "bg-gray-200 text-gray-400")
@@ -389,7 +548,7 @@ const ChatUI = ({
                         </div>
 
                         {/* Messages Container */}
-                        <div className={`flex-1 min-h-0 overflow-y-auto p-6 space-y-6 scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-transparent ${isDarkMode
+                        <div className={`flex-1 min-h-0 overflow-y-auto p-3 sm:p-6 space-y-4 sm:space-y-6 scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-transparent ${isDarkMode
                             ? "bg-gray-900/50"
                             : "bg-gray-50"
                             }`}>
@@ -398,11 +557,11 @@ const ChatUI = ({
                                 return (
                                     <div
                                         key={i}
-                                        className={`animate-message-in flex gap-4 max-w-3xl mx-auto ${msg.sender === "user" ? "ml-auto" : "mr-auto"
+                                        className={`animate-message-in flex gap-2 sm:gap-4 max-w-3xl mx-auto ${msg.sender === "user" ? "ml-auto" : "mr-auto"
                                             }`}
                                     >
                                         {/* Avatar */}
-                                        <div className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center ${msg.sender === "user"
+                                        <div className={`flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center ${msg.sender === "user"
                                             ? (isDarkMode
                                                 ? "bg-blue-900/50 border border-blue-800/50"
                                                 : "bg-blue-100 border border-blue-200")
@@ -411,13 +570,13 @@ const ChatUI = ({
                                                 : "bg-white border border-gray-200")
                                             }`}>
                                             {msg.sender === "user" ? (
-                                                <FiUser className={`w-5 h-5 ${isDarkMode ? "text-blue-400" : "text-blue-600"
+                                                <FiUser className={`w-4 h-4 sm:w-5 sm:h-5 ${isDarkMode ? "text-blue-400" : "text-blue-600"
                                                     }`} />
                                             ) : (
                                                 <img
                                                     src={ib3}
                                                     alt="Bot"
-                                                    className="w-7 h-7 object-contain scale-125"
+                                                    className="w-5 h-5 sm:w-7 sm:h-7 object-contain scale-125"
                                                 />
                                             )}
                                         </div>
@@ -509,24 +668,25 @@ const ChatUI = ({
                         </div>
 
                         {/* Input Area - Fixed at Bottom */}
-                        <div className={`sticky bottom-0 p-3 border-t ${isDarkMode
+                        <div className={`sticky bottom-0 p-2 sm:p-3 border-t ${isDarkMode
                             ? "bg-gray-900/95 backdrop-blur-sm border-gray-800"
                             : "bg-white/95 backdrop-blur-sm border-gray-200"
                             }`}>
                             <div className="max-w-3xl mx-auto">
                                 {/* Status Bar */}
-                                <div className={`flex items-center justify-between mb-3 px-1 ${isDarkMode ? "text-gray-400" : "text-gray-500"
+                                <div className={`flex items-center justify-between mb-2 sm:mb-3 px-1 ${isDarkMode ? "text-gray-400" : "text-gray-500"
                                     }`}>
-                                    <div className="flex items-center gap-2 text-sm">
+                                    <div className="flex items-center gap-2 text-xs sm:text-sm">
                                         {selectedMachine && (
                                             <>
                                                 <div className={`w-2 h-2 rounded-full ${loading ? "bg-amber-500 animate-pulse" : "bg-green-500"
                                                     }`}></div>
-                                                <span>Connected to <span className="font-semibold">{selectedMachine}</span></span>
+                                                <span className="hidden sm:inline">Connected to <span className="font-semibold">{selectedMachine}</span></span>
+                                                <span className="sm:hidden"><span className="font-semibold">{selectedMachine}</span></span>
                                             </>
                                         )}
                                     </div>
-                                    <div className="text-xs">
+                                    <div className="text-xs hidden sm:block">
                                         {messages.length} messages • Press Enter to send
                                     </div>
                                 </div>
@@ -559,13 +719,13 @@ const ChatUI = ({
                                                     ? "Type your question or describe the issue..."
                                                     : "Select a machine to enable chat..."
                                             }
-                                            className="flex-1 bg-transparent py-4 focus:outline-none disabled:opacity-50"
+                                            className="flex-1 bg-transparent py-3 sm:py-4 text-sm sm:text-base focus:outline-none disabled:opacity-50"
                                         />
                                     </div>
                                     <button
                                         onClick={sendMessage}
                                         disabled={!selectedMachine || !question.trim()}
-                                        className={`flex items-center gap-2 px-6 py-4 rounded-xl font-medium transition-all duration-300 ${!selectedMachine || !question.trim()
+                                        className={`flex items-center gap-2 px-4 sm:px-6 py-3 sm:py-4 rounded-xl font-medium text-sm sm:text-base transition-all duration-300 ${!selectedMachine || !question.trim()
                                             ? (isDarkMode
                                                 ? "bg-gray-700 text-gray-500"
                                                 : "bg-gray-200 text-gray-400")

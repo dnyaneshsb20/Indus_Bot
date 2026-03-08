@@ -122,7 +122,7 @@ const MachineSettings = ({ isDarkMode, onBack }) => {
     return (
         <div className={`h-full flex flex-col ${isDarkMode ? 'bg-gray-950 text-white' : 'bg-gray-50 text-gray-900'}`}>
             {/* Header */}
-            <div className={`px-6 py-3 border-b ${isDarkMode ? 'border-gray-800 bg-gray-900/50' : 'border-gray-200 bg-white'}`}>
+            <div className={`px-4 sm:px-6 py-3 border-b ${isDarkMode ? 'border-gray-800 bg-gray-900/50' : 'border-gray-200 bg-white'}`}>
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                         <button
@@ -136,7 +136,7 @@ const MachineSettings = ({ isDarkMode, onBack }) => {
                             <FiArrowLeft className="w-5 h-5" />
                         </button>
                         <div>
-                            <h1 className="text-2xl font-bold flex items-center gap-2">
+                            <h1 className="text-xl sm:text-2xl font-bold flex items-center gap-2">
                                 {/* <FiSettings className="w-7 h-7 text-blue-500" /> */}
                                 Machine Settings
                             </h1>
@@ -145,17 +145,17 @@ const MachineSettings = ({ isDarkMode, onBack }) => {
                             </p>
                         </div>
                     </div>
-                    <button className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-blue-600 to-cyan-500 text-white rounded-xl font-medium text-sm hover:shadow-lg hover:shadow-blue-500/25 transition-all duration-200 hover:scale-105">
+                    <button className="flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-2.5 bg-gradient-to-r from-blue-600 to-cyan-500 text-white rounded-xl font-medium text-sm hover:shadow-lg hover:shadow-blue-500/25 transition-all duration-200 hover:scale-105">
                         <FiRefreshCw className="w-4 h-4" />
-                        Sync All
+                        <span className="hidden sm:inline">Sync All</span>
                     </button>
                 </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-6">
+            <div className="flex-1 overflow-y-auto p-4 sm:p-6">
                 <div className="max-w-screen-2xl mx-auto">
                     {/* Machine Selector Cards */}
-                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
                         {machines.map((m, index) => {
                             const statusStyle = getStatusStyle(m.status);
                             return (

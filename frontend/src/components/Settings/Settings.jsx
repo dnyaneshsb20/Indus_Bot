@@ -191,7 +191,7 @@ const Settings = ({ isDarkMode, onBack, toggleTheme, appearance, setAppearance, 
     return (
         <div className={`h-full flex flex-col ${isDarkMode ? 'bg-gray-950 text-white' : 'bg-gray-50 text-gray-900'}`}>
             {/* Header */}
-            <div className={`px-6 py-3 border-b ${isDarkMode ? 'border-gray-800 bg-gray-900/50' : 'border-gray-200 bg-white'}`}>
+            <div className={`px-4 sm:px-6 py-3 border-b ${isDarkMode ? 'border-gray-800 bg-gray-900/50' : 'border-gray-200 bg-white'}`}>
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                         <button
@@ -205,7 +205,7 @@ const Settings = ({ isDarkMode, onBack, toggleTheme, appearance, setAppearance, 
                             <FiArrowLeft className="w-5 h-5" />
                         </button>
                         <div>
-                            <h1 className="text-2xl font-bold flex items-center gap-2">
+                            <h1 className="text-xl sm:text-2xl font-bold flex items-center gap-2">
                                 Settings
                             </h1>
                             <p className={`text-sm mt-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
@@ -217,19 +217,19 @@ const Settings = ({ isDarkMode, onBack, toggleTheme, appearance, setAppearance, 
             </div>
 
             {/* Content */}
-            <div className="flex-1 overflow-y-auto p-6">
+            <div className="flex-1 overflow-y-auto p-4 sm:p-6">
                 <div className="max-w-screen-xl mx-auto">
-                    <div className="flex flex-col lg:flex-row gap-6">
+                    <div className="flex flex-col lg:flex-row gap-4 sm:gap-6">
                         {/* Section Navigation */}
                         <div className="lg:w-64 flex-shrink-0">
-                            <div className={`p-2 rounded-xl border sticky top-0 ${isDarkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'
+                            <div className={`p-2 rounded-xl border lg:sticky lg:top-0 ${isDarkMode ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'
                                 }`}>
-                                <nav className="space-y-1">
+                                <nav className="flex lg:flex-col gap-1 overflow-x-auto lg:overflow-x-visible pb-2 lg:pb-0">
                                     {sections.map((section) => (
                                         <button
                                             key={section.id}
                                             onClick={() => setActiveSection(section.id)}
-                                            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${activeSection === section.id
+                                            className={`flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl text-sm font-medium transition-all duration-200 whitespace-nowrap ${activeSection === section.id
                                                 ? isDarkMode
                                                     ? 'bg-blue-900/30 text-blue-400 border border-blue-800/30'
                                                     : 'bg-blue-50 text-blue-600 border border-blue-200'

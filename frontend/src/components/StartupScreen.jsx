@@ -146,35 +146,35 @@ const StartupScreen = ({ isDarkMode }) => {
                             <img
                                 src={ib}
                                 alt="IndusBot AI"
-                                className="w-28 h-28 relative z-10"
+                                className="w-20 h-20 sm:w-28 sm:h-28 relative z-10"
                             />
                             {/* Rotating ring */}
                             <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 
-                w-40 h-40 border-2 border-dashed rounded-full animate-spin-slow
+                w-28 h-28 sm:w-40 sm:h-40 border-2 border-dashed rounded-full animate-spin-slow
                 ${isDarkMode ? "border-blue-500/20" : "border-blue-400/10"}`} />
                         </div>
                     </div>
 
-                    <h1 className={`text-4xl font-bold tracking-tight mb-2 animate-fade-up ${isDarkMode ? "text-white" : "text-gray-900"
+                    <h1 className={`text-2xl sm:text-4xl font-bold tracking-tight mb-2 animate-fade-up ${isDarkMode ? "text-white" : "text-gray-900"
                         }`}>
                         <span className="bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 
                            bg-clip-text text-transparent animate-gradient bg-[length:200%_auto]">
                             IndusBot AI
                         </span>
                     </h1>
-                    <p className={`text-lg font-medium animate-fade-up ${isDarkMode ? "text-gray-400" : "text-gray-600"
+                    <p className={`text-sm sm:text-lg font-medium animate-fade-up ${isDarkMode ? "text-gray-400" : "text-gray-600"
                         }`} style={{ animationDelay: '0.1s' }}>
                         Industrial Machine Intelligence Platform
                     </p>
                 </div>
 
                 {/* Status Panel */}
-                <div className={` max-w-7xl rounded-2xl border backdrop-blur-xl overflow-hidden  ${isDarkMode
+                <div className={`max-w-7xl rounded-2xl border backdrop-blur-xl overflow-hidden mx-4 sm:mx-0 ${isDarkMode
                         ? "bg-gray-900/80 border-gray-800/50"
                         : "bg-white/90 border-gray-200/50"
                     }`}>
                     {/* Header */}
-                    <div className={`px-8 py-6 border-b ${isDarkMode ? "border-gray-800" : "border-gray-200"
+                    <div className={`px-4 sm:px-8 py-4 sm:py-6 border-b ${isDarkMode ? "border-gray-800" : "border-gray-200"
                         }`}>
                         <div className="flex items-center gap-4">
                             <div className={`p-3 rounded-xl ${isDarkMode
@@ -185,15 +185,15 @@ const StartupScreen = ({ isDarkMode }) => {
                                     }`} />
                             </div>
                             <div className="flex-1">
-                                <h2 className={`text-2xl font-bold ${isDarkMode ? "text-white" : "text-gray-900"
+                                <h2 className={`text-lg sm:text-2xl font-bold ${isDarkMode ? "text-white" : "text-gray-900"
                                     }`}>
                                     System Initialization
                                 </h2>
-                                <p className={`text-base ${isDarkMode ? "text-gray-400" : "text-gray-500"}`}>
+                                <p className={`text-sm sm:text-base ${isDarkMode ? "text-gray-400" : "text-gray-500"}`}>
                                     {status}
                                 </p>
                             </div>
-                            <div className={`text-3xl font-bold ${isDarkMode ? "text-blue-400" : "text-blue-600"
+                            <div className={`text-2xl sm:text-3xl font-bold ${isDarkMode ? "text-blue-400" : "text-blue-600"
                                 }`}>
                                 {progress}%
                             </div>
@@ -201,7 +201,7 @@ const StartupScreen = ({ isDarkMode }) => {
                     </div>
 
                     {/* Progress and Modules */}
-                    <div className="p-8">
+                    <div className="p-4 sm:p-8">
                         {/* Progress Bar */}
                         <div className="mb-4">
                             <div className={`h-3 rounded-full overflow-hidden relative ${isDarkMode ? "bg-gray-800" : "bg-gray-200"
@@ -220,7 +220,7 @@ const StartupScreen = ({ isDarkMode }) => {
                                 }`}>
                                 LOADING INDUSTRIAL MODULES
                             </h3>
-                            <div className="grid grid-cols-2 md:grid-cols-8 gap-4">
+                            <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3 sm:gap-4">
                                 {maintenanceModules.map((module) => {
                                     const isLoaded = modulesLoaded.some(m => m.id === module.id);
                                     return (

@@ -5,6 +5,8 @@ import Sidebar from "./components/Sidebar";
 import StartupScreen from "./components/StartupScreen";
 import ChatSessions from "./components/ChatSessions";
 import MachineSettings from "./components/MachineSettings";
+import Documentation from "./components/Documentation";
+import KnowledgeBase from "./components/KnowledgeBase";
 import Settings from "./components/Settings/Settings";
 import LoginScreen from "./components/LoginScreen";
 import SessionTimeoutModal from "./components/SessionTimeoutModal";
@@ -13,7 +15,9 @@ function App() {
   const [messages, setMessages] = useState([]);
   const [question, setQuestion] = useState("");
   const [loading, setLoading] = useState(false);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(() => {
+    return typeof window !== 'undefined' && window.innerWidth >= 1024;
+  });
   const [selectedMachine, setSelectedMachine] = useState("");
   const [isDarkMode, setIsDarkMode] = useState(() => {
     return localStorage.getItem("darkMode") === "true";
@@ -219,6 +223,10 @@ function App() {
 
   const handleNavigate = (page) => {
     setActivePage(page);
+    // Auto-close sidebar on mobile
+    if (typeof window !== 'undefined' && window.innerWidth < 1024) {
+      setIsSidebarOpen(false);
+    }
   };
 
   const sendMessage = async () => {
@@ -268,6 +276,20 @@ function App() {
             onBack={() => setActivePage("dashboard")}
           />
         );
+      case 'documentation':
+        return (
+          <Documentation
+            isDarkMode={isDarkMode}
+            onBack={() => setActivePage("dashboard")}
+          />
+        );
+      case 'knowledgeBase':
+        return (
+          <KnowledgeBase
+            isDarkMode={isDarkMode}
+            onBack={() => setActivePage("dashboard")}
+          />
+        );
       case 'settings':
         return (
           <Settings
@@ -291,6 +313,7 @@ function App() {
             sendMessage={sendMessage}
             loading={loading}
             isSidebarOpen={isSidebarOpen}
+            toggleSidebar={toggleSidebar}
             selectedMachine={selectedMachine}
             setSelectedMachine={setSelectedMachine}
             isDarkMode={isDarkMode}
