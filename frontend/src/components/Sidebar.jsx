@@ -1,3 +1,5 @@
+import { useState, useEffect } from 'react';
+import { getChats } from '../services/api';
 import {
     FiX,
     FiMenu,
@@ -27,7 +29,44 @@ import {
 } from 'react-icons/tb';
 import ib from "../assets/ib2.png";
 
-const Sidebar = ({ isOpen, toggleSidebar, isDarkMode, activePage, onNavigate, toggleTheme }) => {
+const Sidebar = ({ isOpen, toggleSidebar, isDarkMode, activePage, onNavigate, toggleTheme, onLoadChat }) => {
+    const [recentChats, setRecentChats] = useState([]);
+
+    useEffect(() => {
+        const fetchRecentChats = async () => {
+            try {
+                const res = await getChats();
+                const chats = res.data.slice(0, 3).map(chat => ({
+                    id: chat.id,
+                    title: chat.title || 'New Chat',
+                    machine: chat.machine,
+                    time: formatRelativeTime(chat.created_at)
+                }));
+                setRecentChats(chats);
+            } catch (err) {
+                console.error('Failed to fetch recent chats:', err);
+            }
+        };
+        fetchRecentChats();
+    }, []);
+
+    const formatRelativeTime = (dateStr) => {
+        if (!dateStr) return '';
+        const date = new Date(dateStr);
+        const now = new Date();
+        const diffMs = now - date;
+        const diffMins = Math.floor(diffMs / 60000);
+        const diffHours = Math.floor(diffMs / 3600000);
+        const diffDays = Math.floor(diffMs / 86400000);
+
+        if (diffMins < 1) return 'Just now';
+        if (diffMins < 60) return `${diffMins}m ago`;
+        if (diffHours < 24) return `${diffHours}h ago`;
+        if (diffDays === 1) return 'Yesterday';
+        if (diffDays < 7) return `${diffDays} days ago`;
+        return date.toLocaleDateString();
+    };
+
     const menuItems = [
         { icon: <FiHome />, label: 'Dashboard', page: 'dashboard' },
         { icon: <FiMessageSquare />, label: 'Chat Sessions', page: 'chatSessions' },
@@ -43,12 +82,6 @@ const Sidebar = ({ isOpen, toggleSidebar, isDarkMode, activePage, onNavigate, to
         { icon: <FiShield />, label: 'Security' },
         { icon: <FiHelpCircle />, label: 'Support' },
         { icon: <FiSettings />, label: 'Settings', page: 'settings' },
-    ];
-
-    const recentChats = [
-        { id: 1, title: 'Error E-102 Fix', time: '10:30 AM' },
-        { id: 2, title: 'Machine Calibration', time: 'Yesterday' },
-        { id: 3, title: 'Safety Protocols', time: '2 days ago' },
     ];
 
     return (
@@ -173,6 +206,7 @@ const Sidebar = ({ isOpen, toggleSidebar, isDarkMode, activePage, onNavigate, to
                                 {recentChats.map((chat) => (
                                     <button
                                         key={chat.id}
+                                        onClick={() => onLoadChat && onLoadChat(chat.id, chat.machine)}
                                         className={`flex items-center justify-between w-full p-3 rounded-lg transition-all duration-200 group ${isDarkMode
                                             ? "hover:bg-gray-800 text-gray-400 hover:text-gray-300"
                                             : "hover:bg-gray-100 text-gray-600 hover:text-gray-900"

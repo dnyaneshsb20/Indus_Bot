@@ -21,98 +21,80 @@ import { TbRobot, TbDeviceAnalytics } from 'react-icons/tb';
 import { MdOutlineSmartToy } from 'react-icons/md';
 import { BsChatDots } from 'react-icons/bs';
 import { motion, AnimatePresence } from 'framer-motion';
+import { getChats, getMessages } from '../services/api';
 
-const ChatSessions = ({ isDarkMode, onBack }) => {
+const ChatSessions = ({ isDarkMode, onBack, onNewChat, onLoadChat }) => {
     const [searchQuery, setSearchQuery] = useState('');
     const [activeFilter, setActiveFilter] = useState('all');
     const [selectedSession, setSelectedSession] = useState(null);
     const [showMobileFilters, setShowMobileFilters] = useState(false);
     const [isLoaded, setIsLoaded] = useState(false);
+    const [sessions, setSessions] = useState([]);
 
     useEffect(() => {
-        setIsLoaded(true);
-    }, []);
+        const fetchSessions = async () => {
+            try {
+                const res = await getChats();
+                const chats = res.data;
 
-    const sessions = [
-        {
-            id: 1,
-            title: 'Error E-102 Troubleshooting',
-            lastMessage: 'The error was resolved by recalibrating the sensor module with precision alignment tools...',
-            time: '10:30 AM',
-            date: 'Today',
-            messages: 12,
-            status: 'active',
-            machine: 'CNC Mill #3',
-            priority: 'high',
-            participants: 2,
-            lastActive: '2 minutes ago'
-        },
-        {
-            id: 2,
-            title: 'Machine Calibration Guide',
-            lastMessage: 'Follow these steps to calibrate the X-axis alignment for optimal performance and accuracy...',
-            time: '2:15 PM',
-            date: 'Yesterday',
-            messages: 8,
-            status: 'completed',
-            machine: 'Lathe #1',
-            priority: 'medium',
-            participants: 3,
-            lastActive: '1 day ago'
-        },
-        {
-            id: 3,
-            title: 'Safety Protocol Review',
-            lastMessage: 'All safety checks have been verified and documented according to ISO standards...',
-            time: '9:00 AM',
-            date: 'Yesterday',
-            messages: 15,
-            status: 'completed',
-            machine: 'Press #2',
-            priority: 'high',
-            participants: 4,
-            lastActive: '1 day ago'
-        },
-        {
-            id: 4,
-            title: 'Preventive Maintenance Schedule',
-            lastMessage: 'Next maintenance window is scheduled for March 10 with complete system overhaul...',
-            time: '4:45 PM',
-            date: 'Mar 1',
-            messages: 6,
-            status: 'archived',
-            machine: 'CNC Mill #1',
-            priority: 'low',
-            participants: 2,
-            lastActive: '3 days ago'
-        },
-        {
-            id: 5,
-            title: 'Oil Pressure Warning Analysis',
-            lastMessage: 'The oil pressure readings indicate normal operation within acceptable parameters...',
-            time: '11:20 AM',
-            date: 'Mar 1',
-            messages: 9,
-            status: 'completed',
-            machine: 'Hydraulic Press #1',
-            priority: 'medium',
-            participants: 3,
-            lastActive: '2 days ago'
-        },
-        {
-            id: 6,
-            title: 'New Operator Training Queries',
-            lastMessage: 'Refer to section 4.2 of the operator manual for detailed instructions on machine startup...',
-            time: '3:30 PM',
-            date: 'Feb 28',
-            messages: 22,
-            status: 'archived',
-            machine: 'Assembly Line #2',
-            priority: 'low',
-            participants: 5,
-            lastActive: '5 days ago'
-        },
-    ];
+                const sessionsData = await Promise.all(
+                    chats.map(async (chat) => {
+                        let messageCount = 0;
+                        let lastMessageText = '';
+                        try {
+                            const msgRes = await getMessages(chat.id);
+                            messageCount = msgRes.data.length;
+                            if (msgRes.data.length > 0) {
+                                const lastMsg = msgRes.data[msgRes.data.length - 1];
+                                lastMessageText = lastMsg.content?.text || '';
+                            }
+                        } catch (e) {
+                            // If messages fetch fails, continue with 0
+                        }
+
+                        // Append 'Z' to explicitly parse the Supabase timestamp as UTC
+                        const createdAtString = chat.created_at.endsWith('Z') ? chat.created_at : `${chat.created_at}Z`;
+                        const createdAt = new Date(createdAtString);
+                        const now = new Date();
+                        const diffMs = now - createdAt;
+                        const diffMins = Math.floor(diffMs / 60000);
+                        const diffHours = Math.floor(diffMs / 3600000);
+                        const diffDays = Math.floor(diffMs / 86400000);
+
+                        let dateLabel = createdAt.toLocaleDateString();
+                        let lastActive = '';
+                        if (diffMins < 1) { dateLabel = 'Today'; lastActive = 'Just now'; }
+                        else if (diffMins < 60) { dateLabel = 'Today'; lastActive = `${diffMins} minutes ago`; }
+                        else if (diffHours < 24) { dateLabel = 'Today'; lastActive = `${diffHours} hours ago`; }
+                        else if (diffDays === 1) { dateLabel = 'Yesterday'; lastActive = '1 day ago'; }
+                        else if (diffDays < 7) { dateLabel = `${diffDays} days ago`; lastActive = `${diffDays} days ago`; }
+                        else { lastActive = dateLabel; }
+
+                        return {
+                            id: chat.id,
+                            title: chat.title || 'New Chat',
+                            lastMessage: lastMessageText || 'No messages yet',
+                            time: createdAt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                            date: dateLabel,
+                            messages: messageCount,
+                            status: 'active',
+                            machine: chat.machine || 'General',
+                            priority: 'medium',
+                            participants: 1,
+                            lastActive: lastActive
+                        };
+                    })
+                );
+
+                setSessions(sessionsData);
+                setIsLoaded(true);
+            } catch (err) {
+                console.error('Failed to fetch chat sessions:', err);
+                setIsLoaded(true);
+            }
+        };
+        fetchSessions();
+    }, []);
 
     const filters = [
         { key: 'all', label: 'All', icon: FiMessageSquare },
@@ -172,8 +154,8 @@ const ChatSessions = ({ isDarkMode, onBack }) => {
 
     const handleDeleteSession = (e, sessionId) => {
         e.stopPropagation();
-        // Add delete logic here
-        console.log('Delete session:', sessionId);
+        setSessions(prev => prev.filter(s => s.id !== sessionId));
+        if (selectedSession === sessionId) setSelectedSession(null);
     };
 
     return (
@@ -280,7 +262,7 @@ const ChatSessions = ({ isDarkMode, onBack }) => {
                     <motion.button
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
-                        onClick={onBack}
+                        onClick={onNewChat}
                         className="flex items-center gap-1 sm:gap-2 px-3 sm:px-5 py-2 sm:py-2.5 bg-gradient-to-r from-blue-600 to-cyan-500 text-white rounded-xl font-medium text-xs sm:text-sm hover:shadow-lg hover:shadow-blue-500/25 transition-all duration-200"
                     >
                         <FiPlus className="w-3 h-3 sm:w-4 sm:h-4" />
@@ -625,6 +607,10 @@ const ChatSessions = ({ isDarkMode, onBack }) => {
                                                         <motion.button
                                                             whileHover={{ scale: 1.05 }}
                                                             whileTap={{ scale: 0.95 }}
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                if (onLoadChat) onLoadChat(session.id, session.machine);
+                                                            }}
                                                             className="text-xs text-blue-500 hover:text-blue-600 font-medium flex items-center gap-1"
                                                         >
                                                             View Full Conversation

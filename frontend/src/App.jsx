@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { askQuestion } from "./services/api";
+import { askQuestion, getMessages } from "./services/api";
 import ChatUI from "./components/ChatUI";
 import Sidebar from "./components/Sidebar";
 import StartupScreen from "./components/StartupScreen";
@@ -19,6 +19,7 @@ function App() {
     return typeof window !== 'undefined' && window.innerWidth >= 1024;
   });
   const [selectedMachine, setSelectedMachine] = useState("");
+  const [chatId, setChatId] = useState(null);
   const [isDarkMode, setIsDarkMode] = useState(() => {
     return localStorage.getItem("darkMode") === "true";
   });
@@ -229,18 +230,81 @@ function App() {
     }
   };
 
+  const handleNewChat = () => {
+    setMessages([]);
+    setQuestion("");
+    setChatId(null);
+    setActivePage("dashboard");
+    if (typeof window !== 'undefined' && window.innerWidth < 1024) {
+      setIsSidebarOpen(false);
+    }
+  };
+
+  const handleLoadChat = async (id, machineName = null) => {
+    setLoading(true);
+    
+    try {
+      const res = await getMessages(id);
+      const loadedMessages = res.data.map(m => ({
+        sender: m.sender,
+        text: m.content?.text || ""
+      }));
+      
+      setMessages(loadedMessages);
+      setChatId(id);
+      if (machineName) {
+        setSelectedMachine(machineName);
+      }
+      setActivePage("dashboard");
+    } catch (err) {
+      console.error("Failed to load chat messages:", err);
+      // Even if load fails, we should probably go to dashboard to show the error
+      setMessages([{ sender: "bot", text: "❌ Failed to load messages. Please try again." }]);
+      setActivePage("dashboard");
+    } finally {
+      setLoading(false);
+      if (typeof window !== 'undefined' && window.innerWidth < 1024) {
+        setIsSidebarOpen(false);
+      }
+    }
+  };
+
   const sendMessage = async () => {
+
     if (!question.trim() || !selectedMachine) return;
 
-    setMessages((prev) => [...prev, { sender: "user", text: question }]);
+    const userMessage = {
+      sender: "user",
+      text: question
+    };
+
+    setMessages((prev) => [...prev, userMessage]);
     setQuestion("");
     setLoading(true);
 
     try {
-      const res = await askQuestion(question);
-      setMessages((prev) => [...prev, { sender: "bot", text: res.data.answer }]);
-    } catch {
-      setMessages((prev) => [...prev, { sender: "bot", text: "❌ Backend error" }]);
+
+      const res = await askQuestion(question, chatId);
+
+      // Save chat id returned from backend
+      if (!chatId) {
+        setChatId(res.data.chat_id);
+      }
+
+      const botMessage = {
+        sender: "bot",
+        text: res.data.answer
+      };
+
+      setMessages((prev) => [...prev, botMessage]);
+
+    } catch (error) {
+
+      setMessages((prev) => [
+        ...prev,
+        { sender: "bot", text: "❌ Backend error" }
+      ]);
+
     } finally {
       setLoading(false);
     }
@@ -267,6 +331,8 @@ function App() {
           <ChatSessions
             isDarkMode={isDarkMode}
             onBack={() => setActivePage("dashboard")}
+            onNewChat={handleNewChat}
+            onLoadChat={handleLoadChat}
           />
         );
       case 'machineSettings':
@@ -332,6 +398,7 @@ function App() {
         activePage={activePage}
         onNavigate={handleNavigate}
         toggleTheme={toggleTheme}
+        onLoadChat={handleLoadChat}
       />
 
       <div className="flex-1 relative">

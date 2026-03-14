@@ -113,6 +113,7 @@ const ChatUI = ({
     const [scanActive, setScanActive] = useState(true);
     const [machineDropdownOpen, setMachineDropdownOpen] = useState(false);
     const dropdownRef = useRef(null);
+    const [chatId, setChatId] = useState(null);
 
     // Close dropdown on outside click
     useEffect(() => {
