@@ -1,3 +1,4 @@
+#chat_db.py
 from backend.supabase_client import supabase
 
 def save_message(chat_id, sender, message_type, content):

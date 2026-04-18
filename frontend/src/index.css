@@ -670,3 +670,48 @@
 .compact-mode .rounded-xl {
   border-radius: 0.5rem !important;
 }
+/* Add to your global CSS file or component styles */
+.message-content {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+.message-content pre {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+/* Smooth scrolling for code blocks */
+.message-content pre::-webkit-scrollbar {
+    height: 8px;
+}
+
+.message-content pre::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+}
+
+.message-content pre::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+}
+
+.message-content pre::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.5);
+}
+
+/* Animation for new messages */
+@keyframes messageAppear {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.message-content {
+    animation: messageAppear 0.3s ease-out;
+}

@@ -15,6 +15,7 @@ import {
     FiVolume2,
     FiMenu,
 } from 'react-icons/fi';
+import ReactMarkdown from 'react-markdown';
 import { motion, AnimatePresence } from "framer-motion";
 import {
     TbRobot,
@@ -128,10 +129,11 @@ const ChatUI = ({
 
     const machines = [
         { id: 'CNC Router', name: 'CNC Router', status: 'online' },
-        { id: 'Laser Cutter', name: 'Laser Cutter', status: 'online' },
-        { id: '3D Printer', name: '3D Printer', status: 'maintenance' },
-        { id: 'CNC Mill', name: 'CNC Mill', status: 'online' },
-        { id: 'Lathe', name: 'Lathe', status: 'offline' },
+        { id: 'Lathe Machine', name: 'Lathe Machine', status: 'online' },
+        { id: 'Drilling Machine', name: 'Drilling Machine', status: 'maintenance' },
+        { id: 'Milling Machine', name: 'Milling Machine', status: 'online' },
+        { id: 'Grinding Machine', name: 'Grinding Machine', status: 'maintenance' },
+        { id: 'Injection Molding Machine', name: 'Injection Molding Machine', status: 'offline' },
     ];
 
     const getStatusColor = (status) => {
@@ -598,7 +600,116 @@ const ChatUI = ({
 
                                             {/* Message Text */}
                                             <div className={`leading-relaxed ${bubble.text}`}>
-                                                {msg.text}
+                                                {/* Message Content with Enhanced Typography */}
+                                                <div className="message-content">
+                                                    <ReactMarkdown
+                                                        components={{
+                                                            // Custom heading styles
+                                                            h1: ({ node, ...props }) => (
+                                                                <h1 className={`text-2xl font-bold mt-4 mb-2 first:mt-0 ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`} {...props} />
+                                                            ),
+                                                            h2: ({ node, ...props }) => (
+                                                                <h2 className={`text-xl font-semibold mt-3 mb-2 first:mt-0 ${isDarkMode ? 'text-gray-200' : 'text-gray-800'}`} {...props} />
+                                                            ),
+                                                            h3: ({ node, ...props }) => (
+                                                                <h3 className={`text-lg font-semibold mt-3 mb-2 first:mt-0 ${isDarkMode ? 'text-gray-200' : 'text-gray-800'}`} {...props} />
+                                                            ),
+
+                                                            // Paragraph with better spacing
+                                                            p: ({ node, ...props }) => (
+                                                                <p className={`mb-3 last:mb-0 leading-relaxed ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`} {...props} />
+                                                            ),
+
+                                                            // Code blocks with syntax highlighting style
+                                                            code: ({ node, inline, className, children, ...props }) => {
+                                                                const match = /language-(\w+)/.exec(className || '');
+                                                                return !inline ? (
+                                                                    <div className={`rounded-lg overflow-hidden my-3 ${isDarkMode ? 'bg-gray-900' : 'bg-gray-100'}`}>
+                                                                        <div className={`px-4 py-2 text-xs font-mono border-b ${isDarkMode ? 'bg-gray-800 border-gray-700 text-gray-400' : 'bg-gray-200 border-gray-300 text-gray-600'}`}>
+                                                                            {match ? match[1] : 'code'}
+                                                                        </div>
+                                                                        <pre className={`p-4 overflow-x-auto text-sm font-mono ${isDarkMode ? 'text-gray-300' : 'text-gray-800'}`}>
+                                                                            <code className={className} {...props}>
+                                                                                {children}
+                                                                            </code>
+                                                                        </pre>
+                                                                    </div>
+                                                                ) : (
+                                                                    <code className={`px-1.5 py-0.5 rounded text-sm font-mono ${isDarkMode ? 'bg-gray-800 text-blue-400' : 'bg-gray-100 text-blue-600'}`} {...props}>
+                                                                        {children}
+                                                                    </code>
+                                                                );
+                                                            },
+
+                                                            // Lists with proper indentation
+                                                            ul: ({ node, ...props }) => (
+                                                                <ul className={`list-disc pl-5 mb-3 space-y-1 ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`} {...props} />
+                                                            ),
+                                                            ol: ({ node, ...props }) => (
+                                                                <ol className={`list-decimal pl-5 mb-3 space-y-1 ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`} {...props} />
+                                                            ),
+                                                            li: ({ node, ...props }) => (
+                                                                <li className="mb-1" {...props} />
+                                                            ),
+
+                                                            // Blockquotes for important notes
+                                                            blockquote: ({ node, ...props }) => (
+                                                                <blockquote className={`border-l-4 pl-4 my-3 py-2 ${isDarkMode
+                                                                    ? 'border-blue-500 bg-blue-900/20 text-gray-300'
+                                                                    : 'border-blue-500 bg-blue-50 text-gray-700'}`} {...props} />
+                                                            ),
+
+                                                            // Links with better styling
+                                                            a: ({ node, ...props }) => (
+                                                                <a className={`underline decoration-2 underline-offset-2 transition-colors ${isDarkMode
+                                                                    ? 'text-blue-400 hover:text-blue-300'
+                                                                    : 'text-blue-600 hover:text-blue-700'}`}
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    {...props} />
+                                                            ),
+
+                                                            // Tables for structured data
+                                                            table: ({ node, ...props }) => (
+                                                                <div className="overflow-x-auto my-3">
+                                                                    <table className={`min-w-full border-collapse rounded-lg overflow-hidden ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`} {...props} />
+                                                                </div>
+                                                            ),
+                                                            th: ({ node, ...props }) => (
+                                                                <th className={`px-3 py-2 text-left text-sm font-semibold border ${isDarkMode
+                                                                    ? 'bg-gray-800 border-gray-700 text-gray-200'
+                                                                    : 'bg-gray-50 border-gray-200 text-gray-800'}`} {...props} />
+                                                            ),
+                                                            td: ({ node, ...props }) => (
+                                                                <td className={`px-3 py-2 text-sm border ${isDarkMode
+                                                                    ? 'border-gray-700 text-gray-300'
+                                                                    : 'border-gray-200 text-gray-700'}`} {...props} />
+                                                            ),
+
+                                                            // Emphasis and strong text
+                                                            em: ({ node, ...props }) => (
+                                                                <em className={`italic ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`} {...props} />
+                                                            ),
+                                                            strong: ({ node, ...props }) => (
+                                                                <strong className={`font-semibold ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`} {...props} />
+                                                            ),
+
+                                                            // Horizontal rule
+                                                            hr: ({ node, ...props }) => (
+                                                                <hr className={`my-4 ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`} {...props} />
+                                                            ),
+                                                        }}
+                                                    >
+                                                        {msg.text}
+                                                    </ReactMarkdown>
+                                                </div>
+
+                                                {/* Optional: Add a subtle gradient fade for long messages */}
+                                                {msg.text && msg.text.length > 1000 && (
+                                                    <div className={`relative mt-2 pt-2 text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>
+                                                        <span>End of message</span>
+                                                    </div>
+                                                )}
                                             </div>
 
                                             {/* Message Actions */}

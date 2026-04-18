@@ -1,3 +1,4 @@
+#text_extractor.py
 import os
 
 DATA_DIR = "data"

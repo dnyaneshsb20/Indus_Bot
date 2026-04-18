@@ -1,3 +1,4 @@
+#embedding_generator.py
 from sentence_transformers import SentenceTransformer
 from text_preprocessor import extract_all_manuals, clean_text, chunk_text
 
