@@ -702,16 +702,65 @@
 
 /* Animation for new messages */
 @keyframes messageAppear {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .message-content {
-    animation: messageAppear 0.3s ease-out;
+  animation: messageAppear 0.3s ease-out;
 }
+
+/* Moving Glow Border Animation */
+@keyframes glow-move {
+  0% {
+    offset-distance: 0%;
+  }
+  100% {
+    offset-distance: 100%;
+  }
+}
+
+.glow-border-wrapper {
+  position: relative;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.glow-border-wrapper::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  transform-origin: 50%;
+  /* Using project colors: Blue-600 (#2563eb) and Cyan-500 (#06b6d4) */
+  background: radial-gradient(
+    circle at center,
+    #2563eb 0%,
+    #06b6d4 30%,
+    transparent 70%
+  );
+  width: 120px;
+  height: 120px;
+  /* Use a more standard offset-path for better compatibility if needed, 
+     but keeping the user's requested logic */
+  offset-path: rect(0 auto 100% auto);
+  animation: 6s linear infinite glow-move;
+  pointer-events: none;
+}
+
+/* Optional: stronger glow in dark mode */
+.dark .glow-border-wrapper::after {
+  background: radial-gradient(
+    circle at center,
+    #3b82f6 0%,
+    #06b6d4 40%,
+    transparent 75%
+  );
+  filter: blur(4px);
+}

@@ -12,6 +12,7 @@ import {
     FiRefreshCw,
     FiDownload,
     FiCopy,
+    FiCheck,
     FiVolume2,
     FiMenu,
 } from 'react-icons/fi';
@@ -115,6 +116,7 @@ const ChatUI = ({
     const [machineDropdownOpen, setMachineDropdownOpen] = useState(false);
     const dropdownRef = useRef(null);
     const [chatId, setChatId] = useState(null);
+    const [copiedId, setCopiedId] = useState(null);
 
     // Close dropdown on outside click
     useEffect(() => {
@@ -182,6 +184,12 @@ const ChatUI = ({
 
     const formatTimestamp = () => {
         return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    };
+
+    const handleCopy = (text, id) => {
+        navigator.clipboard.writeText(text);
+        setCopiedId(id);
+        setTimeout(() => setCopiedId(null), 2000);
     };
 
 
@@ -464,14 +472,15 @@ const ChatUI = ({
 
                             {/* Input Area */}
                             <div className="max-w-2xl mx-auto">
-                                <div className={`flex gap-2 p-2 rounded-2xl transition-all duration-300 ${inputFocused
-                                    ? (isDarkMode
-                                        ? "ring-2 ring-blue-500/50 bg-gray-800"
-                                        : "ring-2 ring-blue-400/50 bg-white shadow-lg")
-                                    : (isDarkMode
-                                        ? "bg-gray-800 border border-gray-700"
-                                        : "bg-white border border-gray-200 shadow")
-                                    }`}>
+                                <div className="glow-border-wrapper rounded-2xl p-[1px]">
+                                    <div className={`flex gap-2 p-2 rounded-2xl transition-all duration-300 ${inputFocused
+                                        ? (isDarkMode
+                                            ? "ring-2 ring-blue-500/50 bg-gray-800"
+                                            : "ring-2 ring-blue-400/50 bg-white shadow-lg")
+                                        : (isDarkMode
+                                            ? "bg-gray-800 border border-gray-700"
+                                            : "bg-white border border-gray-200 shadow")
+                                        }`}>
                                     <input
                                         type="text"
                                         value={question}
@@ -490,19 +499,20 @@ const ChatUI = ({
                                             : "Please select a machine first..."}
                                         className={`flex-1 bg-transparent px-3 sm:px-5 py-3 sm:py-4 text-sm sm:text-base focus:outline-none disabled:opacity-50 ${isDarkMode ? "placeholder-gray-500" : "placeholder-gray-400"}`}
                                     />
-                                    <button
-                                        onClick={sendMessage}
-                                        disabled={!selectedMachine || !question.trim()}
-                                        className={`flex items-center gap-2 px-4 sm:px-6 py-3 sm:py-4 rounded-xl font-medium text-sm sm:text-base transition-all duration-300 ${!selectedMachine || !question.trim()
-                                            ? (isDarkMode
-                                                ? "bg-gray-700 text-gray-500"
-                                                : "bg-gray-200 text-gray-400")
-                                            : `bg-gradient-to-r from-blue-600 to-cyan-500 text-white hover:shadow-lg hover:scale-105 active:scale-95`
-                                            }`}
-                                    >
-                                        <FiSend className="w-5 h-5" />
-                                        <span>Send</span>
-                                    </button>
+                                        <button
+                                            onClick={sendMessage}
+                                            disabled={!selectedMachine || !question.trim()}
+                                            className={`flex items-center gap-2 px-4 sm:px-6 py-3 sm:py-4 rounded-xl font-medium text-sm sm:text-base transition-all duration-300 ${!selectedMachine || !question.trim()
+                                                ? (isDarkMode
+                                                    ? "bg-gray-700 text-gray-500"
+                                                    : "bg-gray-200 text-gray-400")
+                                                : `bg-gradient-to-r from-blue-600 to-cyan-500 text-white hover:shadow-lg hover:scale-105 active:scale-95`
+                                                }`}
+                                        >
+                                            <FiSend className="w-5 h-5" />
+                                            <span>Send</span>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -551,232 +561,249 @@ const ChatUI = ({
                         </div>
 
                         {/* Messages Container */}
-                        <div className={`flex-1 min-h-0 overflow-y-auto p-3 sm:p-6 space-y-4 sm:space-y-6 scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-transparent ${isDarkMode
+                        <div className={`flex-1 min-h-0 overflow-y-auto px-3 sm:px-6 pt-8 sm:pt-12 pb-2 space-y-4 sm:space-y-6 scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-transparent ${isDarkMode
                             ? "bg-gray-900/50"
                             : "bg-gray-50"
                             }`}>
-                            {messages.map((msg, i) => {
-                                const bubble = getBubbleClasses(msg.sender);
-                                return (
-                                    <div
-                                        key={i}
-                                        className={`animate-message-in flex gap-2 sm:gap-4 max-w-3xl mx-auto ${msg.sender === "user" ? "ml-auto" : "mr-auto"
-                                            }`}
-                                    >
-                                        {/* Avatar */}
-                                        <div className={`flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center ${msg.sender === "user"
-                                            ? (isDarkMode
-                                                ? "bg-blue-900/50 border border-blue-800/50"
-                                                : "bg-blue-100 border border-blue-200")
-                                            : (isDarkMode
-                                                ? "bg-gray-800 border border-gray-700"
-                                                : "bg-white border border-gray-200")
-                                            }`}>
-                                            {msg.sender === "user" ? (
-                                                <FiUser className={`w-4 h-4 sm:w-5 sm:h-5 ${isDarkMode ? "text-blue-400" : "text-blue-600"
-                                                    }`} />
-                                            ) : (
-                                                <img
-                                                    src={ib3}
-                                                    alt="Bot"
-                                                    className="w-5 h-5 sm:w-7 sm:h-7 object-contain scale-125"
-                                                />
-                                            )}
-                                        </div>
-
-                                        {/* Message Content — uses dynamic bubble style */}
-                                        <div className={`flex-1 ${bubble.container}`}>
-                                            {/* Message Header */}
-                                            <div className="flex items-center justify-between mb-3">
-                                                <span className={`text-sm font-semibold ${bubble.header}`}>
-                                                    {msg.sender === "user" ? "You" : "IndusBot"}
-                                                </span>
-                                                <span className={`text-xs flex items-center gap-1 ${isDarkMode ? "text-gray-500" : "text-gray-400"
-                                                    }`}>
-                                                    <FiClock className="w-3 h-3" />
-                                                    {formatTimestamp()}
-                                                </span>
-                                            </div>
-
-                                            {/* Message Text */}
-                                            <div className={`leading-relaxed ${bubble.text}`}>
-                                                {/* Message Content with Enhanced Typography */}
-                                                <div className="message-content">
-                                                    <ReactMarkdown
-                                                        components={{
-                                                            // Custom heading styles
-                                                            h1: ({ node, ...props }) => (
-                                                                <h1 className={`text-2xl font-bold mt-4 mb-2 first:mt-0 ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`} {...props} />
-                                                            ),
-                                                            h2: ({ node, ...props }) => (
-                                                                <h2 className={`text-xl font-semibold mt-3 mb-2 first:mt-0 ${isDarkMode ? 'text-gray-200' : 'text-gray-800'}`} {...props} />
-                                                            ),
-                                                            h3: ({ node, ...props }) => (
-                                                                <h3 className={`text-lg font-semibold mt-3 mb-2 first:mt-0 ${isDarkMode ? 'text-gray-200' : 'text-gray-800'}`} {...props} />
-                                                            ),
-
-                                                            // Paragraph with better spacing
-                                                            p: ({ node, ...props }) => (
-                                                                <p className={`mb-3 last:mb-0 leading-relaxed ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`} {...props} />
-                                                            ),
-
-                                                            // Code blocks with syntax highlighting style
-                                                            code: ({ node, inline, className, children, ...props }) => {
-                                                                const match = /language-(\w+)/.exec(className || '');
-                                                                return !inline ? (
-                                                                    <div className={`rounded-lg overflow-hidden my-3 ${isDarkMode ? 'bg-gray-900' : 'bg-gray-100'}`}>
-                                                                        <div className={`px-4 py-2 text-xs font-mono border-b ${isDarkMode ? 'bg-gray-800 border-gray-700 text-gray-400' : 'bg-gray-200 border-gray-300 text-gray-600'}`}>
-                                                                            {match ? match[1] : 'code'}
-                                                                        </div>
-                                                                        <pre className={`p-4 overflow-x-auto text-sm font-mono ${isDarkMode ? 'text-gray-300' : 'text-gray-800'}`}>
-                                                                            <code className={className} {...props}>
-                                                                                {children}
-                                                                            </code>
-                                                                        </pre>
-                                                                    </div>
-                                                                ) : (
-                                                                    <code className={`px-1.5 py-0.5 rounded text-sm font-mono ${isDarkMode ? 'bg-gray-800 text-blue-400' : 'bg-gray-100 text-blue-600'}`} {...props}>
-                                                                        {children}
-                                                                    </code>
-                                                                );
-                                                            },
-
-                                                            // Lists with proper indentation
-                                                            ul: ({ node, ...props }) => (
-                                                                <ul className={`list-disc pl-5 mb-3 space-y-1 ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`} {...props} />
-                                                            ),
-                                                            ol: ({ node, ...props }) => (
-                                                                <ol className={`list-decimal pl-5 mb-3 space-y-1 ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`} {...props} />
-                                                            ),
-                                                            li: ({ node, ...props }) => (
-                                                                <li className="mb-1" {...props} />
-                                                            ),
-
-                                                            // Blockquotes for important notes
-                                                            blockquote: ({ node, ...props }) => (
-                                                                <blockquote className={`border-l-4 pl-4 my-3 py-2 ${isDarkMode
-                                                                    ? 'border-blue-500 bg-blue-900/20 text-gray-300'
-                                                                    : 'border-blue-500 bg-blue-50 text-gray-700'}`} {...props} />
-                                                            ),
-
-                                                            // Links with better styling
-                                                            a: ({ node, ...props }) => (
-                                                                <a className={`underline decoration-2 underline-offset-2 transition-colors ${isDarkMode
-                                                                    ? 'text-blue-400 hover:text-blue-300'
-                                                                    : 'text-blue-600 hover:text-blue-700'}`}
-                                                                    target="_blank"
-                                                                    rel="noopener noreferrer"
-                                                                    {...props} />
-                                                            ),
-
-                                                            // Tables for structured data
-                                                            table: ({ node, ...props }) => (
-                                                                <div className="overflow-x-auto my-3">
-                                                                    <table className={`min-w-full border-collapse rounded-lg overflow-hidden ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`} {...props} />
-                                                                </div>
-                                                            ),
-                                                            th: ({ node, ...props }) => (
-                                                                <th className={`px-3 py-2 text-left text-sm font-semibold border ${isDarkMode
-                                                                    ? 'bg-gray-800 border-gray-700 text-gray-200'
-                                                                    : 'bg-gray-50 border-gray-200 text-gray-800'}`} {...props} />
-                                                            ),
-                                                            td: ({ node, ...props }) => (
-                                                                <td className={`px-3 py-2 text-sm border ${isDarkMode
-                                                                    ? 'border-gray-700 text-gray-300'
-                                                                    : 'border-gray-200 text-gray-700'}`} {...props} />
-                                                            ),
-
-                                                            // Emphasis and strong text
-                                                            em: ({ node, ...props }) => (
-                                                                <em className={`italic ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`} {...props} />
-                                                            ),
-                                                            strong: ({ node, ...props }) => (
-                                                                <strong className={`font-semibold ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`} {...props} />
-                                                            ),
-
-                                                            // Horizontal rule
-                                                            hr: ({ node, ...props }) => (
-                                                                <hr className={`my-4 ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`} {...props} />
-                                                            ),
-                                                        }}
-                                                    >
-                                                        {msg.text}
-                                                    </ReactMarkdown>
-                                                </div>
-
-                                                {/* Optional: Add a subtle gradient fade for long messages */}
-                                                {msg.text && msg.text.length > 1000 && (
-                                                    <div className={`relative mt-2 pt-2 text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>
-                                                        <span>End of message</span>
+                            <div className="max-w-5xl mx-auto space-y-4 sm:space-y-6">
+                                {messages.map((msg, i) => {
+                                    const bubble = getBubbleClasses(msg.sender);
+                                    return (
+                                        <div
+                                            key={i}
+                                            className="animate-message-in flex gap-3 sm:gap-4 w-full items-start"
+                                        >
+                                            {/* Left Column: Bot Avatar */}
+                                            <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10">
+                                                {msg.sender !== "user" && (
+                                                    <div className={`w-full h-full rounded-full flex items-center justify-center ${isDarkMode
+                                                        ? "bg-gray-800 border border-gray-700"
+                                                        : "bg-white border border-gray-200"
+                                                        }`}>
+                                                        <img
+                                                            src={ib3}
+                                                            alt="Bot"
+                                                            className="w-5 h-5 sm:w-7 sm:h-7 object-contain scale-125"
+                                                        />
                                                     </div>
                                                 )}
                                             </div>
 
-                                            {/* Message Actions */}
-                                            <div className={`flex items-center gap-2 mt-4 pt-3 border-t ${bubble.actions}`}>
-                                                <button className={`flex items-center gap-1 text-xs px-3 py-1.5 rounded-lg transition-colors ${bubble.actionBtn}`}>
-                                                    <FiCopy className="w-3 h-3" />
-                                                    Copy
-                                                </button>
-                                                <button className={`flex items-center gap-1 text-xs px-3 py-1.5 rounded-lg transition-colors ${bubble.actionBtn}`}>
-                                                    <FiVolume2 className="w-3 h-3" />
-                                                    Speak
-                                                </button>
-                                                <button className={`flex items-center gap-1 text-xs px-3 py-1.5 rounded-lg transition-colors ${bubble.actionBtn}`}>
-                                                    <FiDownload className="w-3 h-3" />
-                                                    Save
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                );
-                            })}
+                                            {/* Middle Column: Container (Flex-1) */}
+                                            <div className="flex-1 flex flex-col min-w-0">
+                                                {/* Actual Bubble (Shrink-to-fit) */}
+                                                <div className={`max-w-full w-fit ${bubble.container} ${msg.sender === "user" ? "ml-auto" : "mr-auto"} text-left`}>
+                                                    {/* Message Header */}
+                                                    <div className="flex items-center justify-start gap-4 mb-3">
+                                                        <span className={`text-sm font-semibold ${bubble.header}`}>
+                                                            {msg.sender === "user" ? "You" : "IndusBot"}
+                                                        </span>
+                                                        <span className={`text-xs flex items-center gap-1 ${isDarkMode ? "text-gray-500" : "text-gray-400"}`}>
+                                                            <FiClock className="w-3 h-3" />
+                                                            {formatTimestamp()}
+                                                        </span>
+                                                    </div>
 
-                            {/* Typing Indicator */}
-                            {loading && (
-                                <div className="animate-fade-in max-w-3xl mx-auto flex gap-4">
-                                    <div className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center ${isDarkMode
-                                        ? "bg-gray-800 border border-gray-700"
-                                        : "bg-white border border-gray-200"
-                                        }`}>
-                                        <img
-                                            src={ib3}
-                                            alt="Bot"
-                                            className="w-6 h-6 object-contain animate-pulse"
-                                        />
-                                    </div>
-                                    <div className={`flex-1 rounded-2xl p-5 ${isDarkMode
-                                        ? "bg-gray-800/50 border border-gray-700"
-                                        : "bg-white border border-gray-200 shadow-sm"
-                                        }`}>
-                                        <div className="flex items-center gap-3">
-                                            <div className="flex gap-1">
-                                                {[0, 1, 2].map((dot) => (
-                                                    <div
-                                                        key={dot}
-                                                        className={`w-2 h-2 rounded-full ${isDarkMode ? "bg-blue-400" : "bg-blue-500"
-                                                            }`}
-                                                        style={{
-                                                            animation: `typing 1.4s infinite ${dot * 0.2}s`
-                                                        }}
-                                                    ></div>
-                                                ))}
+                                                    {/* Message Text */}
+                                                    <div className={`leading-relaxed ${bubble.text}`}>
+                                                        {/* Message Content with Enhanced Typography */}
+                                                        <div className="message-content">
+                                                            <ReactMarkdown
+                                                                components={{
+                                                                    // Custom heading styles
+                                                                    h1: ({ node, ...props }) => (
+                                                                        <h1 className={`text-2xl font-bold mt-4 mb-2 first:mt-0 ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`} {...props} />
+                                                                    ),
+                                                                    h2: ({ node, ...props }) => (
+                                                                        <h2 className={`text-xl font-semibold mt-3 mb-2 first:mt-0 ${isDarkMode ? 'text-gray-200' : 'text-gray-800'}`} {...props} />
+                                                                    ),
+                                                                    h3: ({ node, ...props }) => (
+                                                                        <h3 className={`text-lg font-semibold mt-3 mb-2 first:mt-0 ${isDarkMode ? 'text-gray-200' : 'text-gray-800'}`} {...props} />
+                                                                    ),
+
+                                                                    // Paragraph with better spacing
+                                                                    p: ({ node, ...props }) => (
+                                                                        <p className={`mb-3 last:mb-0 leading-relaxed ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`} {...props} />
+                                                                    ),
+
+                                                                    // Code blocks with syntax highlighting style
+                                                                    code: ({ node, inline, className, children, ...props }) => {
+                                                                        const match = /language-(\w+)/.exec(className || '');
+                                                                        return !inline ? (
+                                                                            <div className={`rounded-lg overflow-hidden my-3 ${isDarkMode ? 'bg-gray-900' : 'bg-gray-100'}`}>
+                                                                                <div className={`px-4 py-2 text-xs font-mono border-b ${isDarkMode ? 'bg-gray-800 border-gray-700 text-gray-400' : 'bg-gray-200 border-gray-300 text-gray-600'}`}>
+                                                                                    {match ? match[1] : 'code'}
+                                                                                </div>
+                                                                                <pre className={`p-4 overflow-x-auto text-sm font-mono ${isDarkMode ? 'text-gray-300' : 'text-gray-800'}`}>
+                                                                                    <code className={className} {...props}>
+                                                                                        {children}
+                                                                                    </code>
+                                                                                </pre>
+                                                                            </div>
+                                                                        ) : (
+                                                                            <code className={`px-1.5 py-0.5 rounded text-sm font-mono ${isDarkMode ? 'bg-gray-800 text-blue-400' : 'bg-gray-100 text-blue-600'}`} {...props}>
+                                                                                {children}
+                                                                            </code>
+                                                                        );
+                                                                    },
+
+                                                                    // Lists with proper indentation
+                                                                    ul: ({ node, ...props }) => (
+                                                                        <ul className={`list-disc pl-5 mb-3 space-y-1 ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`} {...props} />
+                                                                    ),
+                                                                    ol: ({ node, ...props }) => (
+                                                                        <ol className={`list-decimal pl-5 mb-3 space-y-1 ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`} {...props} />
+                                                                    ),
+                                                                    li: ({ node, ...props }) => (
+                                                                        <li className="mb-1" {...props} />
+                                                                    ),
+
+                                                                    // Blockquotes for important notes
+                                                                    blockquote: ({ node, ...props }) => (
+                                                                        <blockquote className={`border-l-4 pl-4 my-3 py-2 ${isDarkMode
+                                                                            ? 'border-blue-500 bg-blue-900/20 text-gray-300'
+                                                                            : 'border-blue-500 bg-blue-50 text-gray-700'}`} {...props} />
+                                                                    ),
+
+                                                                    // Links with better styling
+                                                                    a: ({ node, ...props }) => (
+                                                                        <a className={`underline decoration-2 underline-offset-2 transition-colors ${isDarkMode
+                                                                            ? 'text-blue-400 hover:text-blue-300'
+                                                                            : 'text-blue-600 hover:text-blue-700'}`}
+                                                                            target="_blank"
+                                                                            rel="noopener noreferrer"
+                                                                            {...props} />
+                                                                    ),
+
+                                                                    // Tables for structured data
+                                                                    table: ({ node, ...props }) => (
+                                                                        <div className="overflow-x-auto my-3">
+                                                                            <table className={`min-w-full border-collapse rounded-lg overflow-hidden ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`} {...props} />
+                                                                        </div>
+                                                                    ),
+                                                                    th: ({ node, ...props }) => (
+                                                                        <th className={`px-3 py-2 text-left text-sm font-semibold border ${isDarkMode
+                                                                            ? 'bg-gray-800 border-gray-700 text-gray-200'
+                                                                            : 'bg-gray-50 border-gray-200 text-gray-800'}`} {...props} />
+                                                                    ),
+                                                                    td: ({ node, ...props }) => (
+                                                                        <td className={`px-3 py-2 text-sm border ${isDarkMode
+                                                                            ? 'border-gray-700 text-gray-300'
+                                                                            : 'border-gray-200 text-gray-700'}`} {...props} />
+                                                                    ),
+
+                                                                    // Emphasis and strong text
+                                                                    em: ({ node, ...props }) => (
+                                                                        <em className={`italic ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`} {...props} />
+                                                                    ),
+                                                                    strong: ({ node, ...props }) => (
+                                                                        <strong className={`font-semibold ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`} {...props} />
+                                                                    ),
+
+                                                                    // Horizontal rule
+                                                                    hr: ({ node, ...props }) => (
+                                                                        <hr className={`my-4 ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`} {...props} />
+                                                                    ),
+                                                                }}
+                                                            >
+                                                                {msg.text}
+                                                            </ReactMarkdown>
+                                                        </div>
+
+                                                        {/* Optional: Add a subtle gradient fade for long messages */}
+                                                        {msg.text && msg.text.length > 1000 && (
+                                                            <div className={`relative mt-2 pt-2 text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>
+                                                                <span>End of message</span>
+                                                            </div>
+                                                        )}
+                                                    </div>
+
+                                                        {/* Message Actions */}
+                                                        <div className={`flex items-center gap-2 mt-1 pt-1 border-t ${bubble.actions}`}>
+                                                            <button
+                                                                onClick={() => handleCopy(msg.text, i)}
+                                                                className={`flex items-center gap-1 text-xs px-3 py-1.5 rounded-lg transition-all duration-200 ${copiedId === i
+                                                                    ? "bg-green-500/20 text-green-500 border border-green-500/30"
+                                                                    : bubble.actionBtn
+                                                                    }`}>
+                                                                {copiedId === i ? (
+                                                                    <>
+                                                                        <FiCheck className="w-3 h-3" />
+                                                                        Copied
+                                                                    </>
+                                                                ) : (
+                                                                    <>
+                                                                        <FiCopy className="w-3 h-3" />
+                                                                        Copy
+                                                                    </>
+                                                                )}
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                            {/* Right Column: User Avatar */}
+                                            <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10">
+                                                {msg.sender === "user" && (
+                                                    <div className={`w-full h-full rounded-full flex items-center justify-center ${isDarkMode
+                                                        ? "bg-blue-900/50 border border-blue-800/50"
+                                                        : "bg-blue-100 border border-blue-200"
+                                                        }`}>
+                                                        <FiUser className={`w-4 h-4 sm:w-5 sm:h-5 ${isDarkMode ? "text-blue-400" : "text-blue-600"}`} />
+                                                    </div>
+                                                )}
                                             </div>
-                                            <span className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-500"
-                                                }`}>
-                                                Analyzing your query...
-                                            </span>
                                         </div>
-                                        <div className={`text-xs mt-3 ${isDarkMode ? "text-gray-500" : "text-gray-400"
+                                    );
+                                })}
+
+                                {/* Typing Indicator */}
+                                {loading && (
+                                    <div className="animate-fade-in flex gap-4">
+                                        <div className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center ${isDarkMode
+                                            ? "bg-gray-800 border border-gray-700"
+                                            : "bg-white border border-gray-200"
                                             }`}>
-                                            Searching knowledge base and machine schematics
+                                            <img
+                                                src={ib3}
+                                                alt="Bot"
+                                                className="w-6 h-6 object-contain animate-pulse"
+                                            />
                                         </div>
+                                        <div className="flex-1 flex flex-col min-w-0">
+                                            <div className={`w-fit rounded-2xl p-5 mr-auto ${isDarkMode
+                                                ? "bg-gray-800/50 border border-gray-700"
+                                                : "bg-white border border-gray-200 shadow-sm"
+                                                }`}>
+                                                <div className="flex items-center gap-3">
+                                                    <div className="flex gap-1">
+                                                        {[0, 1, 2].map((dot) => (
+                                                            <div
+                                                                key={dot}
+                                                                className={`w-2 h-2 rounded-full ${isDarkMode ? "bg-blue-400" : "bg-blue-500"}`}
+                                                                style={{
+                                                                    animation: `typing 1.4s infinite ${dot * 0.2}s`
+                                                                }}
+                                                            ></div>
+                                                        ))}
+                                                    </div>
+                                                    <span className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-500"}`}>
+                                                        Analyzing your query...
+                                                    </span>
+                                                </div>
+                                                <div className={`text-xs mt-3 ${isDarkMode ? "text-gray-500" : "text-gray-400"}`}>
+                                                    Searching knowledge base and machine schematics
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {/* Right Spacer for Typing Indicator */}
+                                        <div className="flex-shrink-0 w-10 h-10"></div>
                                     </div>
-                                </div>
-                            )}
+                                )}
 
-                            {/* Auto-scroll anchor */}
-                            <div ref={messagesEndRef} className="h-4" />
+                                {/* Auto-scroll anchor */}
+                                <div ref={messagesEndRef} className="h-0" />
+                            </div>
                         </div>
 
                         {/* Input Area - Fixed at Bottom */}
@@ -784,7 +811,7 @@ const ChatUI = ({
                             ? "bg-gray-900/95 backdrop-blur-sm border-gray-800"
                             : "bg-white/95 backdrop-blur-sm border-gray-200"
                             }`}>
-                            <div className="max-w-3xl mx-auto">
+                            <div className="max-w-5xl mx-auto">
                                 {/* Status Bar */}
                                 <div className={`flex items-center justify-between mb-2 sm:mb-3 px-1 ${isDarkMode ? "text-gray-400" : "text-gray-500"
                                     }`}>
@@ -798,17 +825,18 @@ const ChatUI = ({
                                             </>
                                         )}
                                     </div>
-                                    <div className="text-xs hidden sm:block">
+                                    {/* <div className="text-xs hidden sm:block">
                                         {messages.length} messages • Press Enter to send
-                                    </div>
+                                    </div> */}
                                 </div>
 
                                 {/* Input Container */}
-                                <div className={`flex gap-3 ${isDarkMode
-                                    ? "bg-gray-800 border border-gray-700"
-                                    : "bg-white border border-gray-200 shadow-lg"
-                                    } rounded-2xl p-2 transition-all duration-300 ${inputFocused ? "ring-2 ring-blue-500/50" : ""
-                                    }`}>
+                                <div className="glow-border-wrapper rounded-2xl p-[1px]">
+                                    <div className={`flex gap-3 ${isDarkMode
+                                        ? "bg-gray-800 border border-gray-700"
+                                        : "bg-white border border-gray-200 shadow-lg"
+                                        } rounded-2xl p-2 transition-all duration-300 ${inputFocused ? "ring-2 ring-blue-500/50" : ""
+                                        }`}>
                                     <div className={`flex-1 flex items-center px-4 ${isDarkMode ? "text-gray-300" : "text-gray-700"
                                         }`}>
                                         <FiSearch className={`w-5 h-5 mr-3 ${isDarkMode ? "text-gray-500" : "text-gray-400"
@@ -848,6 +876,7 @@ const ChatUI = ({
                                         <span className="hidden sm:inline">Send</span>
                                     </button>
                                 </div>
+                            </div>
 
                                 {/* Quick Actions */}
                                 {/* <div className="flex items-center justify-center gap-4 mt-4">
