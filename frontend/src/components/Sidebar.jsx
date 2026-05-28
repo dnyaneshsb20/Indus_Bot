@@ -29,8 +29,28 @@ import {
 } from 'react-icons/tb';
 import ib from "../assets/ib2.png";
 
-const Sidebar = ({ isOpen, toggleSidebar, isDarkMode, activePage, onNavigate, toggleTheme, onLoadChat }) => {
+const Sidebar = ({ isOpen, toggleSidebar, isDarkMode, activePage, onNavigate, toggleTheme, onLoadChat, currentUser, chatRefreshTrigger }) => {
     const [recentChats, setRecentChats] = useState([]);
+
+    // Derived user info
+    const displayName = currentUser?.first_name && currentUser?.last_name 
+        ? `${currentUser.first_name} ${currentUser.last_name}`
+        : currentUser?.first_name || currentUser?.username || 'User';
+
+    const getInitials = () => {
+        if (currentUser?.first_name && currentUser?.last_name) {
+            return (currentUser.first_name[0] + currentUser.last_name[0]).toUpperCase();
+        }
+        if (currentUser?.first_name) {
+            return currentUser.first_name[0].toUpperCase();
+        }
+        if (currentUser?.username) {
+            return currentUser.username[0].toUpperCase();
+        }
+        return 'U';
+    };
+
+    const displayRole = currentUser?.role || 'user';
 
     useEffect(() => {
         const fetchRecentChats = async () => {
@@ -48,7 +68,7 @@ const Sidebar = ({ isOpen, toggleSidebar, isDarkMode, activePage, onNavigate, to
             }
         };
         fetchRecentChats();
-    }, []);
+    }, [chatRefreshTrigger]);
 
     const formatRelativeTime = (dateStr) => {
         if (!dateStr) return '';
@@ -278,18 +298,17 @@ const Sidebar = ({ isOpen, toggleSidebar, isDarkMode, activePage, onNavigate, to
                         <div className="space-y-4">
                             {/* User Profile */}
                             <div className="flex items-center gap-3">
-                                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${isDarkMode ? "bg-gray-100" : "bg-gray-800"
-                                    }`}>
-                                    <span className={`font-semibold ${isDarkMode ? "text-gray-900" : "text-white"}`}>
-                                        DB
+                                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${isDarkMode ? "bg-gray-100 text-gray-900" : "bg-gray-800 text-white"}`}>
+                                    <span className="font-semibold uppercase">
+                                        {getInitials()}
                                     </span>
                                 </div>
                                 <div className="flex-1">
-                                    <p className={`font-medium text-sm ${isDarkMode ? "text-gray-100" : "text-gray-900"}`}>
-                                        Dnyanesh Badave
+                                    <p className={`font-medium text-sm truncate max-w-[140px] ${isDarkMode ? "text-gray-100" : "text-gray-900"}`} title={displayName}>
+                                        {displayName}
                                     </p>
-                                    <p className={`text-xs ${isDarkMode ? "text-gray-500" : "text-gray-400"}`}>
-                                        Admin
+                                    <p className={`text-xs capitalize ${isDarkMode ? "text-gray-500" : "text-gray-400"}`}>
+                                        {displayRole}
                                     </p>
                                 </div>
                             </div>
@@ -334,10 +353,9 @@ const Sidebar = ({ isOpen, toggleSidebar, isDarkMode, activePage, onNavigate, to
                         </div>
                     ) : (
                         <div className="flex flex-col items-center space-y-4">
-                            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${isDarkMode ? "bg-gray-100" : "bg-gray-800"
-                                }`}>
-                                <span className={`font-semibold ${isDarkMode ? "text-gray-900" : "text-white"}`}>
-                                    DB
+                            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${isDarkMode ? "bg-gray-100 text-gray-900" : "bg-gray-800 text-white"}`} title={displayName}>
+                                <span className="font-semibold uppercase">
+                                    {getInitials()}
                                 </span>
                             </div>
                             <button

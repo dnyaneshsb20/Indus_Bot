@@ -13,11 +13,9 @@ import {
     FiCpu,
     FiCalendar,
     FiMessageCircle,
-    FiMoreVertical,
     FiFilter,
-    FiX
 } from 'react-icons/fi';
-import { TbRobot, TbDeviceAnalytics } from 'react-icons/tb';
+import { TbDeviceAnalytics } from 'react-icons/tb';
 import { MdOutlineSmartToy } from 'react-icons/md';
 import { BsChatDots } from 'react-icons/bs';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -26,7 +24,6 @@ import { getChats, getMessages } from '../services/api';
 const ChatSessions = ({ isDarkMode, onBack, onNewChat, onLoadChat }) => {
     const [searchQuery, setSearchQuery] = useState('');
     const [activeFilter, setActiveFilter] = useState('all');
-    const [selectedSession, setSelectedSession] = useState(null);
     const [showMobileFilters, setShowMobileFilters] = useState(false);
     const [isLoaded, setIsLoaded] = useState(false);
     const [sessions, setSessions] = useState([]);
@@ -78,7 +75,7 @@ const ChatSessions = ({ isDarkMode, onBack, onNewChat, onLoadChat }) => {
                             date: dateLabel,
                             messages: messageCount,
                             status: 'active',
-                            machine: chat.machine || 'General',
+                            machine: chat.machine,
                             priority: 'medium',
                             participants: 1,
                             lastActive: lastActive
@@ -152,10 +149,9 @@ const ChatSessions = ({ isDarkMode, onBack, onNewChat, onLoadChat }) => {
         }
     };
 
-    const handleDeleteSession = (e, sessionId) => {
+    const handleDeleteSession = (e, chatId) => {
         e.stopPropagation();
-        setSessions(prev => prev.filter(s => s.id !== sessionId));
-        if (selectedSession === sessionId) setSelectedSession(null);
+        setSessions(prev => prev.filter(s => s.id !== chatId));
     };
 
     return (
@@ -209,7 +205,7 @@ const ChatSessions = ({ isDarkMode, onBack, onNewChat, onLoadChat }) => {
                 initial={{ y: -20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ duration: 0.5 }}
-                className={`relative px-4 sm:px-6 py-4 border-b backdrop-blur-sm ${isDarkMode
+                className={`relative px-4 sm:px-6 py-3 border-b backdrop-blur-sm ${isDarkMode
                     ? 'border-gray-800 bg-gray-900/50'
                     : 'border-gray-200 bg-white/50'
                     }`}
@@ -300,10 +296,10 @@ const ChatSessions = ({ isDarkMode, onBack, onNewChat, onLoadChat }) => {
                             whileTap={{ scale: 0.95 }}
                             onClick={() => setShowMobileFilters(!showMobileFilters)}
                             className={`p-3 rounded-xl ${activeFilter !== 'all'
-                                    ? 'bg-blue-600 text-white'
-                                    : isDarkMode
-                                        ? 'bg-gray-800 text-gray-400'
-                                        : 'bg-gray-100 text-gray-600'
+                                ? 'bg-blue-600 text-white'
+                                : isDarkMode
+                                    ? 'bg-gray-800 text-gray-400'
+                                    : 'bg-gray-100 text-gray-600'
                                 }`}
                         >
                             <FiFilter className="w-4 h-4" />
@@ -428,9 +424,9 @@ const ChatSessions = ({ isDarkMode, onBack, onNewChat, onLoadChat }) => {
                                 </p>
                             </motion.div>
                         ) : (
-                            filteredSessions.map((session, index) => (
+                            filteredSessions.map((chat, index) => (
                                 <motion.div
-                                    key={session.id}
+                                    key={chat.id}
                                     layout
                                     variants={itemVariants}
                                     initial="hidden"
@@ -438,15 +434,11 @@ const ChatSessions = ({ isDarkMode, onBack, onNewChat, onLoadChat }) => {
                                     exit={{ opacity: 0, scale: 0.9, y: -20 }}
                                     whileHover={{ scale: 1.01, y: -2 }}
                                     whileTap={{ scale: 0.99 }}
-                                    onClick={() => setSelectedSession(session.id === selectedSession ? null : session.id)}
-                                    className={`p-4 sm:p-5 rounded-xl border transition-all duration-300 cursor-pointer group relative overflow-hidden ${selectedSession === session.id
-                                            ? isDarkMode
-                                                ? 'border-blue-500/50 bg-gradient-to-br from-gray-800 to-gray-900'
-                                                : 'border-blue-500/50 bg-gradient-to-br from-white to-blue-50/50'
-                                            : isDarkMode
-                                                ? 'bg-gray-900/50 border-gray-800 hover:border-gray-700 hover:bg-gray-800/50'
-                                                : 'bg-white/50 border-gray-200 hover:border-gray-300 hover:shadow-lg hover:bg-white'
-                                        }`}
+                                    onClick={() => onLoadChat && onLoadChat(chat.id, chat.machine)}
+                                    className={`p-4 sm:p-5 rounded-xl border transition-all duration-300 cursor-pointer group relative overflow-hidden ${isDarkMode
+                                        ? 'bg-gray-900/50 border-gray-800 hover:border-gray-700 hover:bg-gray-800/50'
+                                        : 'bg-white/50 border-gray-200 hover:border-gray-300 hover:shadow-lg hover:bg-white'
+                                    }`}
                                 >
                                     {/* Animated Gradient Background on Hover */}
                                     <motion.div
@@ -467,38 +459,38 @@ const ChatSessions = ({ isDarkMode, onBack, onNewChat, onLoadChat }) => {
                                                         }}
                                                         transition={{
                                                             duration: 2,
-                                                            repeat: session.status === 'active' ? Infinity : 0,
+                                                            repeat: chat.status === 'active' ? Infinity : 0,
                                                             repeatDelay: 1
                                                         }}
-                                                        className={`w-2 h-2 rounded-full bg-gradient-to-r ${getStatusColor(session.status)}`}
+                                                        className={`w-2 h-2 rounded-full bg-gradient-to-r ${getStatusColor(chat.status)}`}
                                                     />
                                                     <h3 className="font-semibold text-sm sm:text-base truncate max-w-[150px] sm:max-w-xs">
-                                                        {session.title}
+                                                        {chat.title}
                                                     </h3>
                                                 </div>
                                                 <div className="flex items-center gap-2">
-                                                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium border capitalize ${getPriorityBadge(session.priority)}`}>
-                                                        {session.priority}
+                                                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium border capitalize ${getPriorityBadge(chat.priority)}`}>
+                                                        {chat.priority}
                                                     </span>
                                                     <span className={`px-2 py-0.5 rounded-full text-xs font-medium border ${isDarkMode
-                                                            ? session.status === 'active'
-                                                                ? 'bg-green-900/40 text-green-400 border-green-800/40'
-                                                                : session.status === 'completed'
-                                                                    ? 'bg-blue-900/40 text-blue-400 border-blue-800/40'
-                                                                    : 'bg-gray-800 text-gray-400 border-gray-700'
-                                                            : session.status === 'active'
-                                                                ? 'bg-green-50 text-green-700 border-green-200'
-                                                                : session.status === 'completed'
-                                                                    ? 'bg-blue-50 text-blue-700 border-blue-200'
-                                                                    : 'bg-gray-100 text-gray-600 border-gray-200'
+                                                        ? chat.status === 'active'
+                                                            ? 'bg-green-900/40 text-green-400 border-green-800/40'
+                                                            : chat.status === 'completed'
+                                                                ? 'bg-blue-900/40 text-blue-400 border-blue-800/40'
+                                                                : 'bg-gray-800 text-gray-400 border-gray-700'
+                                                        : chat.status === 'active'
+                                                            ? 'bg-green-50 text-green-700 border-green-200'
+                                                            : chat.status === 'completed'
+                                                                ? 'bg-blue-50 text-blue-700 border-blue-200'
+                                                                : 'bg-gray-100 text-gray-600 border-gray-200'
                                                         }`}>
-                                                        {session.status}
+                                                        {chat.status}
                                                     </span>
                                                 </div>
                                             </div>
 
                                             <p className={`text-xs sm:text-sm mb-3 pl-4 line-clamp-2 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                                                {session.lastMessage}
+                                                {chat.lastMessage}
                                             </p>
 
                                             <div className="flex flex-wrap items-center gap-3 sm:gap-6 pl-4">
@@ -507,8 +499,8 @@ const ChatSessions = ({ isDarkMode, onBack, onNewChat, onLoadChat }) => {
                                                     className={`flex items-center gap-1.5 text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}
                                                 >
                                                     <FiCalendar className="w-3 h-3" />
-                                                    <span className="hidden sm:inline">{session.date} at {session.time}</span>
-                                                    <span className="sm:hidden">{session.date}</span>
+                                                    <span className="hidden sm:inline">{chat.date} at {chat.time}</span>
+                                                    <span className="sm:hidden">{chat.date}</span>
                                                 </motion.span>
 
                                                 <motion.span
@@ -516,7 +508,7 @@ const ChatSessions = ({ isDarkMode, onBack, onNewChat, onLoadChat }) => {
                                                     className={`flex items-center gap-1.5 text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}
                                                 >
                                                     <FiMessageCircle className="w-3 h-3" />
-                                                    {session.messages}
+                                                    {chat.messages}
                                                 </motion.span>
 
                                                 <motion.span
@@ -524,17 +516,17 @@ const ChatSessions = ({ isDarkMode, onBack, onNewChat, onLoadChat }) => {
                                                     className={`flex items-center gap-1.5 text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}
                                                 >
                                                     <FiCpu className="w-3 h-3" />
-                                                    <span className="hidden sm:inline">{session.machine}</span>
-                                                    <span className="sm:hidden truncate max-w-[80px]">{session.machine}</span>
+                                                    <span className="hidden sm:inline">{chat.machine}</span>
+                                                    <span className="sm:hidden truncate max-w-[80px]">{chat.machine}</span>
                                                 </motion.span>
 
-                                                {session.participants && (
+                                                {chat.participants && (
                                                     <motion.span
                                                         whileHover={{ scale: 1.05 }}
                                                         className={`hidden sm:flex items-center gap-1.5 text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}
                                                     >
                                                         <TbDeviceAnalytics className="w-3 h-3" />
-                                                        {session.participants} participants
+                                                        {chat.participants} participants
                                                     </motion.span>
                                                 )}
                                             </div>
@@ -543,7 +535,7 @@ const ChatSessions = ({ isDarkMode, onBack, onNewChat, onLoadChat }) => {
                                             <div className="sm:hidden flex items-center gap-3 mt-2 pl-4">
                                                 <span className={`text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>
                                                     <FiClock className="w-3 h-3 inline mr-1" />
-                                                    {session.lastActive}
+                                                    {chat.lastActive}
                                                 </span>
                                             </div>
                                         </div>
@@ -552,7 +544,7 @@ const ChatSessions = ({ isDarkMode, onBack, onNewChat, onLoadChat }) => {
                                             <motion.button
                                                 whileHover={{ scale: 1.1 }}
                                                 whileTap={{ scale: 0.9 }}
-                                                onClick={(e) => handleDeleteSession(e, session.id)}
+                                                onClick={(e) => handleDeleteSession(e, chat.id)}
                                                 className={`p-1.5 sm:p-2 rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-200 ${isDarkMode
                                                     ? 'hover:bg-red-500/10 text-gray-500 hover:text-red-400'
                                                     : 'hover:bg-red-50 text-gray-400 hover:text-red-500'
@@ -561,66 +553,13 @@ const ChatSessions = ({ isDarkMode, onBack, onNewChat, onLoadChat }) => {
                                                 <FiTrash2 className="w-3 h-3 sm:w-4 sm:h-4" />
                                             </motion.button>
                                             <motion.div
-                                                animate={{ x: selectedSession === session.id ? 5 : 0 }}
-                                                transition={{ type: "spring", stiffness: 300 }}
+                                                className="group-hover:translate-x-1 transition-transform"
                                             >
-                                                <FiChevronRight className={`w-4 h-4 sm:w-5 sm:h-5 transition-colors ${selectedSession === session.id
-                                                        ? 'text-blue-500'
-                                                        : isDarkMode
-                                                            ? 'text-gray-600'
-                                                            : 'text-gray-300'
-                                                    }`} />
+                                                <FiChevronRight className={`w-4 h-4 sm:w-5 sm:h-5 transition-colors ${isDarkMode ? 'text-gray-600 group-hover:text-blue-400' : 'text-gray-300 group-hover:text-blue-500'}`} />
                                             </motion.div>
                                         </div>
                                     </div>
 
-                                    {/* Expanded Content */}
-                                    <AnimatePresence>
-                                        {selectedSession === session.id && (
-                                            <motion.div
-                                                initial={{ height: 0, opacity: 0 }}
-                                                animate={{ height: 'auto', opacity: 1 }}
-                                                exit={{ height: 0, opacity: 0 }}
-                                                transition={{ duration: 0.3 }}
-                                                className="overflow-hidden"
-                                            >
-                                                <div className={`mt-4 pt-4 border-t ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
-                                                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                                                        <div className={`p-2 rounded-lg ${isDarkMode ? 'bg-gray-800' : 'bg-gray-50'}`}>
-                                                            <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Total Messages</p>
-                                                            <p className="text-sm font-semibold mt-1">{session.messages}</p>
-                                                        </div>
-                                                        <div className={`p-2 rounded-lg ${isDarkMode ? 'bg-gray-800' : 'bg-gray-50'}`}>
-                                                            <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Participants</p>
-                                                            <p className="text-sm font-semibold mt-1">{session.participants}</p>
-                                                        </div>
-                                                        <div className={`p-2 rounded-lg ${isDarkMode ? 'bg-gray-800' : 'bg-gray-50'}`}>
-                                                            <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Last Active</p>
-                                                            <p className="text-sm font-semibold mt-1">{session.lastActive}</p>
-                                                        </div>
-                                                        <div className={`p-2 rounded-lg ${isDarkMode ? 'bg-gray-800' : 'bg-gray-50'}`}>
-                                                            <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Machine</p>
-                                                            <p className="text-sm font-semibold mt-1 truncate">{session.machine}</p>
-                                                        </div>
-                                                    </div>
-                                                    <div className="flex justify-end mt-3">
-                                                        <motion.button
-                                                            whileHover={{ scale: 1.05 }}
-                                                            whileTap={{ scale: 0.95 }}
-                                                            onClick={(e) => {
-                                                                e.stopPropagation();
-                                                                if (onLoadChat) onLoadChat(session.id, session.machine);
-                                                            }}
-                                                            className="text-xs text-blue-500 hover:text-blue-600 font-medium flex items-center gap-1"
-                                                        >
-                                                            View Full Conversation
-                                                            <FiChevronRight className="w-3 h-3" />
-                                                        </motion.button>
-                                                    </div>
-                                                </div>
-                                            </motion.div>
-                                        )}
-                                    </AnimatePresence>
                                 </motion.div>
                             ))
                         )}

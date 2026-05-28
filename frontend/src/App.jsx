@@ -20,6 +20,7 @@ function App() {
   });
   const [selectedMachine, setSelectedMachine] = useState("");
   const [chatId, setChatId] = useState(null);
+  const [chatRefreshTrigger, setChatRefreshTrigger] = useState(0);
   const [isDarkMode, setIsDarkMode] = useState(() => {
     return localStorage.getItem("darkMode") === "true";
   });
@@ -27,6 +28,7 @@ function App() {
   // ✅ Auth & Splash states
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showStartup, setShowStartup] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
 
   // ✅ Page navigation state
   const [activePage, setActivePage] = useState("dashboard");
@@ -194,7 +196,8 @@ function App() {
     }
   }, [showStartup]);
 
-  const handleLogin = () => {
+  const handleLogin = (userData) => {
+    setCurrentUser(userData);
     setIsLoggedIn(true);
     setShowStartup(true);
   };
@@ -209,6 +212,7 @@ function App() {
     setShowTimeoutWarning(false);
     setIsLoggedIn(false);
     setShowStartup(false);
+    setCurrentUser(null);
     setActivePage('dashboard');
     setMessages([]);
     setQuestion('');
@@ -234,6 +238,7 @@ function App() {
     setMessages([]);
     setQuestion("");
     setChatId(null);
+    setSelectedMachine("");
     setActivePage("dashboard");
     if (typeof window !== 'undefined' && window.innerWidth < 1024) {
       setIsSidebarOpen(false);
@@ -284,11 +289,12 @@ function App() {
 
     try {
 
-      const res = await askQuestion(question, chatId);
+      const res = await askQuestion(question, chatId, selectedMachine);
 
       // Save chat id returned from backend
       if (!chatId) {
         setChatId(res.data.chat_id);
+        setChatRefreshTrigger(prev => prev + 1);
       }
 
       const botMessage = {
@@ -399,6 +405,8 @@ function App() {
         onNavigate={handleNavigate}
         toggleTheme={toggleTheme}
         onLoadChat={handleLoadChat}
+        currentUser={currentUser}
+        chatRefreshTrigger={chatRefreshTrigger}
       />
 
       <div className="flex-1 relative">

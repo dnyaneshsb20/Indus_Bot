@@ -57,6 +57,31 @@ def retrieve_chunks(machine_name, query, top_k=2):
 
     return [chunks[i] for i in indices[0]]
 
+FRONTEND_MACHINE_MAP = {
+    "cnc router": "cnc_machine",
+    "lathe machine": "lathe_machine",
+    "drilling machine": "drilling_machine",
+    "milling machine": "milling_machine",
+    "grinding machine": "grinding_machine",
+    "injection molding machine": "injection_molding_machine",
+}
+
+def retrieve_chunks_by_machine(machine_name, user_query, top_k=2):
+    user_query = normalize_query(user_query)
+    
+    # Map from frontend machine name to internal folder name
+    machine = FRONTEND_MACHINE_MAP.get(machine_name.lower(), None)
+    
+    # Fallback to auto-detect if not found or no machine name passed
+    if not machine:
+        return retrieve_chunks_auto(user_query, top_k)
+        
+    try:
+        return retrieve_chunks(machine, user_query, top_k), machine
+    except Exception as e:
+        print(f"Error reading vector DB for {machine}: {e}")
+        return [], machine
+
 def retrieve_chunks_auto(user_query, top_k=2):
     # 🔥 normalize first
     user_query = normalize_query(user_query)

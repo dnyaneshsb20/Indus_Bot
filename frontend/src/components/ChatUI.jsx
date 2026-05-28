@@ -9,12 +9,14 @@ import {
     FiCheckCircle,
     FiClock,
     FiSearch,
+    FiMic,
     FiRefreshCw,
     FiDownload,
     FiCopy,
     FiCheck,
     FiVolume2,
     FiMenu,
+    FiLock,
 } from 'react-icons/fi';
 import ReactMarkdown from 'react-markdown';
 import { motion, AnimatePresence } from "framer-motion";
@@ -241,18 +243,20 @@ const ChatUI = ({
                     <div className="relative" ref={dropdownRef}>
                         {/* Dropdown Trigger Button */}
                         <button
-                            onClick={() => setMachineDropdownOpen(!machineDropdownOpen)}
-                            className={`flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl transition-all duration-200 min-w-[160px] sm:min-w-[290px] ${machineDropdownOpen
+                            onClick={() => isFirstLoad && setMachineDropdownOpen(!machineDropdownOpen)}
+                            disabled={!isFirstLoad}
+                            title={!isFirstLoad ? "Machine cannot be changed during an active chat" : ""}
+                            className={`flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl transition-all duration-200 min-w-[160px] sm:min-w-[290px] ${!isFirstLoad ? 'cursor-not-allowed opacity-80' : ''} ${machineDropdownOpen
                                 ? isDarkMode
                                     ? 'bg-gray-800 border-2 border-blue-500/50 ring-2 ring-blue-500/20'
                                     : 'bg-white border-2 border-blue-500/50 ring-2 ring-blue-500/20 shadow-lg'
                                 : isDarkMode
                                     ? selectedMachine
-                                        ? 'bg-gray-800 border border-gray-700 hover:border-gray-600'
-                                        : 'bg-gray-800 border border-gray-700 hover:border-gray-600'
+                                        ? `bg-gray-800 border border-gray-700 ${isFirstLoad ? 'hover:border-gray-600' : ''}`
+                                        : `bg-gray-800 border border-gray-700 ${isFirstLoad ? 'hover:border-gray-600' : ''}`
                                     : selectedMachine
-                                        ? 'bg-white border border-gray-200 hover:border-gray-300 shadow-sm'
-                                        : 'bg-white border border-gray-200 hover:border-gray-300 shadow-sm'
+                                        ? `bg-white border border-gray-200 shadow-sm ${isFirstLoad ? 'hover:border-gray-300' : ''}`
+                                        : `bg-white border border-gray-200 shadow-sm ${isFirstLoad ? 'hover:border-gray-300' : ''}`
                                 }`}
                         >
                             {/* Status Dot */}
@@ -271,12 +275,16 @@ const ChatUI = ({
                                 </p>
                             </div>
 
-                            {/* Chevron */}
+                            {/* Chevron or Lock */}
                             <motion.div
                                 animate={{ rotate: machineDropdownOpen ? 180 : 0 }}
                                 transition={{ duration: 0.2 }}
                             >
-                                <FiChevronDown className={`w-4 h-4 flex-shrink-0 ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`} />
+                                {isFirstLoad ? (
+                                    <FiChevronDown className={`w-4 h-4 flex-shrink-0 ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`} />
+                                ) : (
+                                    <FiLock className={`w-3.5 h-3.5 flex-shrink-0 ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`} />
+                                )}
                             </motion.div>
                         </button>
 
@@ -460,7 +468,7 @@ const ChatUI = ({
                             </p>
 
                             {/* Connection Status */}
-                            <div className={`inline-flex items-center gap-3 px-4 py-3 rounded-xl mb-4 ${isDarkMode
+                            {/* <div className={`inline-flex items-center gap-3 px-4 py-3 rounded-xl mb-4 ${isDarkMode
                                 ? selectedMachine ? "bg-green-900/20 border border-green-800/30" : "bg-gray-800 border border-gray-700"
                                 : selectedMachine ? "bg-green-50 border border-green-200" : "bg-gray-100 border border-gray-200"
                                 }`}>
@@ -710,12 +718,7 @@ const ChatUI = ({
                                                             </ReactMarkdown>
                                                         </div>
 
-                                                        {/* Optional: Add a subtle gradient fade for long messages */}
-                                                        {msg.text && msg.text.length > 1000 && (
-                                                            <div className={`relative mt-2 pt-2 text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>
-                                                                <span>End of message</span>
-                                                            </div>
-                                                        )}
+
                                                     </div>
 
                                                         {/* Message Actions */}
@@ -839,7 +842,7 @@ const ChatUI = ({
                                         }`}>
                                     <div className={`flex-1 flex items-center px-4 ${isDarkMode ? "text-gray-300" : "text-gray-700"
                                         }`}>
-                                        <FiSearch className={`w-5 h-5 mr-3 ${isDarkMode ? "text-gray-500" : "text-gray-400"
+                                        <FiMic className={`w-5 h-5 mr-3 ${isDarkMode ? "text-gray-500" : "text-gray-400"
                                             }`} />
                                         <input
                                             type="text"

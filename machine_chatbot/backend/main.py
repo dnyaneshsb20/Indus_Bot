@@ -5,8 +5,12 @@ from pydantic import BaseModel
 from backend.chat_db import save_message, create_chat
 from backend.answer_generator import generate_answer
 from backend.supabase_client import supabase
+from backend.vector_db_builder import check_and_build_vector_db
 
 app = FastAPI(title="Machine Troubleshooting Chatbot")
+
+# 🔥 Auto-check and build vector database if documents changed
+check_and_build_vector_db()
 
 # ✅ CORS configuration (VERY IMPORTANT for React)
 app.add_middleware(
@@ -20,6 +24,7 @@ app.add_middleware(
 class QuestionRequest(BaseModel):
     question: str
     chat_id: str | None = None
+    machine_name: str | None = None
 
 class AnswerResponse(BaseModel):
     answer: str
@@ -35,12 +40,12 @@ def ask_question(data: QuestionRequest):
     chat_id = data.chat_id
 
     if not chat_id:
-        chat_id = create_chat()
+        chat_id = create_chat(machine_name=data.machine_name)
 
     # Save user message
     save_message(chat_id, "user", "text", {"text": data.question})
 
-    response = generate_answer(data.question)
+    response = generate_answer(data.question, data.machine_name)
 
     # Save bot message
     save_message(chat_id, "bot", "text", {"text": response})

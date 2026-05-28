@@ -1,6 +1,9 @@
 #text_preprocessor.py
 import re
-from text_extractor import extract_all_manuals
+try:
+    from backend.text_extractor import extract_all_manuals
+except ImportError:
+    from text_extractor import extract_all_manuals
 
 def clean_text(text):
     text = text.lower()

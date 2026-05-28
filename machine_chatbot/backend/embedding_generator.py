@@ -1,6 +1,9 @@
 #embedding_generator.py
 from sentence_transformers import SentenceTransformer
-from text_preprocessor import extract_all_manuals, clean_text, chunk_text
+try:
+    from backend.text_preprocessor import extract_all_manuals, clean_text, chunk_text
+except ImportError:
+    from text_preprocessor import extract_all_manuals, clean_text, chunk_text
 
 # Load embedding model
 model = SentenceTransformer("all-MiniLM-L6-v2")

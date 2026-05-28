@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { supabase } from '../supabase/supabaseClient';
 import {
     FiCpu,
     FiServer,
@@ -24,10 +25,6 @@ const LoginScreen = ({ isDarkMode, onLogin }) => {
     const [inputFocused, setInputFocused] = useState(null);
     const [showForgotPassword, setShowForgotPassword] = useState(false);
 
-    // Hardcoded credentials for demo (password can be updated via Change Password flow)
-    const VALID_USERNAME = 'admin';
-    const VALID_PASSWORD = localStorage.getItem('userPassword') || 'admin123';
-
     const handleLogin = async (e) => {
         e.preventDefault();
         setError('');
@@ -40,13 +37,33 @@ const LoginScreen = ({ isDarkMode, onLogin }) => {
 
         setIsLoading(true);
 
-        // Simulate a brief loading delay
-        await new Promise(resolve => setTimeout(resolve, 1200));
+        try {
+            // Query the Supabase users table
+            const { data, error: fetchError } = await supabase
+                .from('users')
+                .select('*')
+                .eq('username', username)
+                .single();
 
-        if (username === VALID_USERNAME && password === VALID_PASSWORD) {
-            onLogin();
-        } else {
-            setError('Invalid username or password');
+            if (fetchError || !data) {
+                setError('Invalid username or password');
+                setShowErrorPopup(true);
+                setIsLoading(false);
+                return;
+            }
+
+            // Compare password
+            if (data.password === password) {
+                // Pass user data to onLogin in case the App needs the role (e.g. data.role)
+                onLogin(data);
+            } else {
+                setError('Invalid username or password');
+                setShowErrorPopup(true);
+                setIsLoading(false);
+            }
+        } catch (err) {
+            console.error("Login error:", err);
+            setError('An error occurred during login. Please try again.');
             setShowErrorPopup(true);
             setIsLoading(false);
         }
